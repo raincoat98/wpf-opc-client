@@ -111,5 +111,50 @@ namespace WpfSamterOpcClient
             Debug.WriteLine("value: " + Utils.Format("{0}", notification.Value.WrappedValue.ToString()) +
               " // StatusCode: " + Utils.Format("{0}", notification.Value.StatusCode.ToString()));
         }
+
+        // item 값 수정 시 사용
+        public async Task WriteItemValue(string itemId, Boolean value)
+        {
+            if(session != null)
+            {
+                try
+                {
+                    WriteValue valueToWrite = new WriteValue();
+
+                    valueToWrite.NodeId = nodeId + itemId;
+                    valueToWrite.AttributeId = Attributes.Value;
+                    valueToWrite.Value.Value = value;
+                    valueToWrite.Value.StatusCode = StatusCodes.Good;
+                    valueToWrite.Value.ServerTimestamp = DateTime.MinValue;
+                    valueToWrite.Value.SourceTimestamp = DateTime.MinValue;
+
+                    WriteValueCollection valuesToWrite = new WriteValueCollection();
+                    valuesToWrite.Add(valueToWrite);
+
+                    // write current value.
+                    StatusCodeCollection results = null;
+                    DiagnosticInfoCollection diagnosticInfos = null;
+
+                    session.Write(
+                        null,
+                        valuesToWrite,
+                        out results,
+                        out diagnosticInfos);
+
+                    ClientBase.ValidateResponse(results, valuesToWrite);
+                    ClientBase.ValidateDiagnosticInfos(diagnosticInfos, valuesToWrite);
+
+                    if (StatusCode.IsBad(results[0]))
+                    {
+                        throw new ServiceResultException(results[0]);
+                    }
+
+                }
+                catch (Exception exception)
+                {
+                    Debug.WriteLine(exception);
+                }
+            }
+        }
     }
 }
