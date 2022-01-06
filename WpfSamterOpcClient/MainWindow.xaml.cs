@@ -28,7 +28,9 @@ namespace WpfSamterOpcClient
         }
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            OpcClient opcClient = new OpcClient();
             Debug.WriteLine("start");
+            Task.Run(() => opcClient.Opcua_start("opc.tcp://192.168.0.211:49320"));
         }
     }
 }
