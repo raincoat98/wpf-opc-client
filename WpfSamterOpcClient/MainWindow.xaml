@@ -3,10 +3,81 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:WpfSamterOpcClient"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="MainWindow_Loaded">
-    <Grid>
+        mc:Ignorable="d" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Title="SamterOpcClient" Loaded="MainWindow_Loaded">
+    <Grid Background="#f5f5fd">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="130"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Label Content="ServerURL" HorizontalAlignment="Left" Margin="40,0,0,0" VerticalAlignment="Center" FontSize="20"/>
+            <TextBox HorizontalAlignment="Left" Margin="150,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Width="280" FontSize="20" Cursor="IBeam"/>
+            <Button Content="Connect" HorizontalAlignment="Left" Margin="450,37,0,0" VerticalAlignment="Top"/>
+            <Button Content="DisConnect" HorizontalAlignment="Left" Margin="545,37,0,0" VerticalAlignment="Top" Background="#444" IsEnabled="False" />
+            <Label Content="Not Connected" HorizontalAlignment="Left" Margin="665,41,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.519,1.128"/>
+        </Grid>
+        <Grid Grid.Row="1" >
+            <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Margin="20 0" CornerRadius="15">
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0"
+                                         Width="150" Height="120" >
+                        <StackPanel Margin="20" HorizontalAlignment="Center">
+                            <TextBlock FontSize="14" Text="STATUS" HorizontalAlignment="Center" Foreground="#444" />
+                            <TextBlock FontWeight="SemiBold" FontSize="25" Text="Running" Margin="0 10 0 0" Foreground="#FF0FC55D" />
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Border>
+                <Border Margin="20 0" CornerRadius="15">
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" 
+                                         Width="150" Height="120" Background="#FFF">
+                        <StackPanel Margin="20" HorizontalAlignment="Center">
+                            <TextBlock FontSize="14" Text="SPEED" HorizontalAlignment="Center" Foreground="#444" />
+                            <TextBlock FontWeight="SemiBold" FontSize="25" Text="300" Margin="0 10 0 0" Foreground="#444" />
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Border>
+                <Border Margin="20 0" CornerRadius="15">
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" 
+                                         Width="250" Height="120" Background="#FFF">
+                        <StackPanel Margin="20" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontSize="12" Text="OrderID: " />
+                                <TextBlock FontSize="12" Text="123561234" />
+                            </StackPanel>
+                            <TextBlock FontWeight="SemiBold" FontSize="14" Text="Quantity / OrderQuantity" Margin="0 10 0 0" Foreground="#444" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontWeight="SemiBold" FontSize="25" Text="3000000" Foreground="#444"/>
+                                <TextBlock FontWeight="SemiBold" FontSize="15" Text="/" Margin="0 10 0 0" Foreground="#444" />
+                                <TextBlock FontWeight="SemiBold" FontSize="15" Text="3000000" Margin="0 10 0 0" Foreground="#444"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Border>
 
+            </WrapPanel>
+
+        </Grid>
+        <Grid Grid.Row="2">
+            <StackPanel>
+                <Label Content="LOG"/>
+                <ListView d:ItemsSource="{d:SampleData ItemCount=5}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Label HorizontalAlignment="Right"  VerticalAlignment="center">
+                <CheckBox Content="AutoConnect"/>
+            </Label>
+        </Grid>
     </Grid>
 </Window>
