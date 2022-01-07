@@ -130,6 +130,42 @@ namespace WpfSamterOpcClient
             string itemId = NodeId.Split('.')[3];
             MainWindow.main.SetChangeItemValue(itemId, Value);
         }
+        // item 값 가져올 때 사용
+        public DataValue ReadItemValue(string itemId)
+        {
+            ReadValueId itemToRead = new ReadValueId();
+            // Read할 NodeId 설정
+            itemToRead.NodeId = new NodeId($"{channel}.{device}.{tagGroup}.{itemId}", nameSpaceIndex);
+
+            itemToRead.AttributeId = Attributes.Value;
+
+            ReadValueIdCollection itemsToRead = new ReadValueIdCollection();
+            itemsToRead.Add(itemToRead);
+
+            // read from server.
+            DataValueCollection values = null;
+            DiagnosticInfoCollection diagnosticInfos = null;
+            itemToRead.AttributeId = Attributes.Value;
+
+            ResponseHeader responseHeader = session.Read(
+                null,
+                0,
+                TimestampsToReturn.Both,
+                itemsToRead,
+                out values,
+                out diagnosticInfos);
+
+            ClientBase.ValidateResponse(values, itemsToRead);
+            ClientBase.ValidateDiagnosticInfos(diagnosticInfos, itemsToRead);
+
+            if (StatusCode.IsBad(values[0].StatusCode))
+            {
+                ServiceResult result = ClientBase.GetResult(values[0].StatusCode, 0, diagnosticInfos, responseHeader);
+                throw new ServiceResultException(result);
+            }
+            // Read한 Item의 Value 값 Return
+            return values[0];
+        }
 
         // item 값 수정 시 사용
         public void WriteItemValue(string itemId, dynamic value)
