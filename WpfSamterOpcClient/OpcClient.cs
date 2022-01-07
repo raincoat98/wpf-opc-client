@@ -132,7 +132,7 @@ namespace WpfSamterOpcClient
         }
 
         // item 값 수정 시 사용
-        public async Task WriteItemValue(string nodeId, Boolean value)
+        public void WriteItemValue(string itemId, dynamic value)
         {
             if(session != null)
             {
@@ -140,7 +140,7 @@ namespace WpfSamterOpcClient
                 {
                     WriteValue valueToWrite = new WriteValue();
 
-                    valueToWrite.NodeId = new NodeId(nodeId, nameSpaceIndex);
+                    valueToWrite.NodeId = new NodeId($"{channel}.{device}.{tagGroup}.{itemId}", nameSpaceIndex);
                     valueToWrite.AttributeId = Attributes.Value;
                     valueToWrite.Value.Value = value;
                     valueToWrite.Value.StatusCode = StatusCodes.Good;
