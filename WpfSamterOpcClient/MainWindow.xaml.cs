@@ -33,7 +33,30 @@ namespace WpfSamterOpcClient
         {
             OpcClient opcClient = new OpcClient();
             Debug.WriteLine("start");
+            InitItemValue();
             Task.Run(() => opcClient.Opcua_start("opc.tcp://192.168.0.211:49320"));
+        }
+
+       public void InitItemValue()
+        {
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                TbServerURLValue.Text = "127.0.0.1";
+
+                BtConnectValue.IsEnabled = true;
+                BtDisConnectValue.IsEnabled = false;
+                LbConnectStatusValue.Content = "Not Connect";
+
+                TbStatusValue.Text = "STOP";
+                TbStatusValue.Foreground = Brushes.Red;
+
+                TbSpeedValue.Text = "0";
+                TbOrderIdValue.Text = "none....";
+
+                TbQuantityValue.Text = "0";
+                TbOrderQuantityValue.Text = "0";
+
+            }));
         }
     }
 }
