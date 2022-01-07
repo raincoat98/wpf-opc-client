@@ -10,7 +10,19 @@ namespace WpfSamterOpcClient
     internal class OpcClient
     {
         public string endpointURL;
-        public string nodeId = "ns=2;s=wookil.diecutter1.plc.";
+
+        private UInt16 nameSpaceIndex = 2;
+        public static string channel = "wookil";
+        public static string device = "diecutter1";
+        public static string tagGroup = "plc";
+
+        readonly static string run = "run";
+        readonly static string stop = "stop";
+        readonly static string speed = "speed";
+        readonly static string orderId = "orderId";
+        readonly static string orderComplate = "orderComplate";
+        readonly static string quantity = "count";
+        readonly static string orderQuantity = "orderCount";
 
         public Session session;
         private ApplicationConfiguration config;
@@ -41,13 +53,13 @@ namespace WpfSamterOpcClient
                 subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 Debug.WriteLine("Step 5 - Add a list of items you wish to monitor to the subscription.");
-                string[] item = new string[] {"orderId","orderCount", "orderComplate", "count","run","stop","speed"};
+                string[] item = { run, stop, speed, orderId, orderComplate, quantity, orderQuantity };
 
                 for (int i = 0; i < item.Length; i++)
                 {
-                    Debug.WriteLine(nodeId + item[i]);
+                    Debug.WriteLine(item[i]);
                     monitoredItem = new MonitoredItem(subscription.DefaultItem);
-                    monitoredItem.StartNodeId = nodeId + item[i];
+                    monitoredItem.StartNodeId = new NodeId($"{channel}.{device}.{tagGroup}.{item[i]}", nameSpaceIndex);
                     monitoredItem.AttributeId = Attributes.Value;
                     monitoredItem.MonitoringMode = MonitoringMode.Reporting;
                     monitoredItem.SamplingInterval = 1000;
@@ -113,12 +125,10 @@ namespace WpfSamterOpcClient
             string StatusCode = notification.Value.StatusCode.ToString();
 
             Debug.WriteLine($"NodeId: {NodeId} // value: {Value} // StatusCode: {StatusCode}");
-
-
         }
 
         // item 값 수정 시 사용
-        public async Task WriteItemValue(string itemId, Boolean value)
+        public async Task WriteItemValue(string nodeId, Boolean value)
         {
             if(session != null)
             {
@@ -126,7 +136,7 @@ namespace WpfSamterOpcClient
                 {
                     WriteValue valueToWrite = new WriteValue();
 
-                    valueToWrite.NodeId = nodeId + itemId;
+                    valueToWrite.NodeId = new NodeId(nodeId, nameSpaceIndex);
                     valueToWrite.AttributeId = Attributes.Value;
                     valueToWrite.Value.Value = value;
                     valueToWrite.Value.StatusCode = StatusCodes.Good;
