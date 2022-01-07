@@ -1,18 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Diagnostics;
 
 
 namespace WpfSamterOpcClient
@@ -29,15 +19,15 @@ namespace WpfSamterOpcClient
             InitializeComponent();
             main = this;
         }
+        OpcClient opcClient = new OpcClient();
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            OpcClient opcClient = new OpcClient();
             Debug.WriteLine("start");
             InitItemValue();
             Task.Run(() => opcClient.Opcua_start("opc.tcp://192.168.0.211:49320"));
         }
 
-       public void InitItemValue()
+        public void InitItemValue()
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -55,6 +45,63 @@ namespace WpfSamterOpcClient
 
                 TbQuantityValue.Text = "0";
                 TbOrderQuantityValue.Text = "0";
+
+            }));
+        }
+
+        public void SetConnectItemValue()
+        {
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                BtConnectValue.IsEnabled = false;
+                BtDisConnectValue.IsEnabled = true;
+                LbConnectStatusValue.Content = "Connect";
+
+            }));
+        }
+
+        public void SetChangeItemValue(string itemId, string value)
+        {
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                //run
+                if (itemId == opcClient.run)
+                {
+                    if (value.Equals("True"))
+                    {
+                        TbStatusValue.Text = "START";
+                        TbStatusValue.Foreground = Brushes.Green;
+                    }
+                    else
+                    {
+                        TbStatusValue.Text = "STOP";
+                        TbStatusValue.Foreground = Brushes.Red;
+                    }
+                }
+
+                //speed
+                if (itemId == opcClient.speed)
+                {
+                    TbSpeedValue.Text = value;
+                }
+
+                //orderId
+                if (itemId == opcClient.orderId)
+                {
+                    TbOrderIdValue.Text = value;
+                }
+
+                //count
+                if (itemId == opcClient.quantity)
+                {
+                    TbQuantityValue.Text = value;
+                }
+
+                //orderCount
+                if (itemId == opcClient.orderQuantity)
+                {
+                    TbOrderQuantityValue.Text = value;
+                }
 
             }));
         }

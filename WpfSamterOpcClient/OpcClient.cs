@@ -16,13 +16,13 @@ namespace WpfSamterOpcClient
         public static string device = "diecutter1";
         public static string tagGroup = "plc";
 
-        readonly static string run = "run";
-        readonly static string stop = "stop";
-        readonly static string speed = "speed";
-        readonly static string orderId = "orderId";
-        readonly static string orderComplate = "orderComplate";
-        readonly static string quantity = "count";
-        readonly static string orderQuantity = "orderCount";
+        public readonly string run = "run";
+        public readonly string stop = "stop";
+        public readonly string speed = "speed";
+        public readonly string orderId = "orderId";
+        public readonly string orderComplate = "orderComplate";
+        public readonly string quantity = "count";
+        public readonly string orderQuantity = "orderCount";
 
         public Session session;
         private ApplicationConfiguration config;
@@ -48,6 +48,8 @@ namespace WpfSamterOpcClient
                 Byte[] cp;
                 session.Browse(null, null, ObjectIds.ObjectsFolder, 0u, BrowseDirection.Forward, ReferenceTypeIds.HierarchicalReferences, true, (uint)NodeClass.Variable | (uint)NodeClass.Object | (uint)NodeClass.Method, out cp, out refs);
 
+                MainWindow.main.SetConnectItemValue();
+
                 // Create Subscription
                 Debug.WriteLine("Step 4 - Create a subscription. Set a faster publishing interval if you wish.");
                 subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
@@ -57,7 +59,6 @@ namespace WpfSamterOpcClient
 
                 for (int i = 0; i < item.Length; i++)
                 {
-                    Debug.WriteLine(item[i]);
                     monitoredItem = new MonitoredItem(subscription.DefaultItem);
                     monitoredItem.StartNodeId = new NodeId($"{channel}.{device}.{tagGroup}.{item[i]}", nameSpaceIndex);
                     monitoredItem.AttributeId = Attributes.Value;
@@ -125,6 +126,9 @@ namespace WpfSamterOpcClient
             string StatusCode = notification.Value.StatusCode.ToString();
 
             Debug.WriteLine($"NodeId: {NodeId} // value: {Value} // StatusCode: {StatusCode}");
+
+            string itemId = NodeId.Split('.')[3];
+            MainWindow.main.SetChangeItemValue(itemId, Value);
         }
 
         // item 값 수정 시 사용
