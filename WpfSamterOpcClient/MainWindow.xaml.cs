@@ -22,9 +22,12 @@ namespace WpfSamterOpcClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        internal static WpfSamterOpcClient.MainWindow main;
+
         public MainWindow()
         {
             InitializeComponent();
+            main = this;
         }
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
