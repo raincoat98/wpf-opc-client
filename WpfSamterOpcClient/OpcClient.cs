@@ -108,9 +108,12 @@ namespace WpfSamterOpcClient
                 return;
             }
 
-            Debug.WriteLine("NodeId: " + Utils.Format("{0}", monitoredItem.StartNodeId) + 
-                "// value: " + Utils.Format("{0}", notification.Value.WrappedValue.ToString()) +
-              " // StatusCode: " + Utils.Format("{0}", notification.Value.StatusCode.ToString()));
+            string NodeId = monitoredItem.StartNodeId.ToString();
+            string Value = notification.Value.WrappedValue.ToString();
+            string StatusCode = notification.Value.StatusCode.ToString();
+
+            Debug.WriteLine($"NodeId: {NodeId} // value: {Value} // StatusCode: {StatusCode}");
+
 
         }
 
