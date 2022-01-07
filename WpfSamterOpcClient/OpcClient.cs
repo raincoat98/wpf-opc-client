@@ -41,7 +41,7 @@ namespace WpfSamterOpcClient
                 subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 Debug.WriteLine("Step 5 - Add a list of items you wish to monitor to the subscription.");
-                int[] item = new int[] {123};
+                string[] item = new string[] {"orderId","orderCount", "orderComplate", "count","run","stop","speed"};
 
                 for (int i = 0; i < item.Length; i++)
                 {
@@ -108,8 +108,10 @@ namespace WpfSamterOpcClient
                 return;
             }
 
-            Debug.WriteLine("value: " + Utils.Format("{0}", notification.Value.WrappedValue.ToString()) +
+            Debug.WriteLine("NodeId: " + Utils.Format("{0}", monitoredItem.StartNodeId) + 
+                "// value: " + Utils.Format("{0}", notification.Value.WrappedValue.ToString()) +
               " // StatusCode: " + Utils.Format("{0}", notification.Value.StatusCode.ToString()));
+
         }
 
         // item 값 수정 시 사용
