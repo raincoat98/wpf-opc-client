@@ -178,7 +178,25 @@ namespace WpfSamterOpcClient
 
                     valueToWrite.NodeId = new NodeId($"{channel}.{device}.{tagGroup}.{itemId}", nameSpaceIndex);
                     valueToWrite.AttributeId = Attributes.Value;
-                    valueToWrite.Value.Value = value;
+
+                    if (value is Int32)
+                    {
+                       value = Convert.ToInt32(value);
+                    }
+
+                    if (value is String)
+                    {
+                        value = Convert.ToUInt16(value);
+                    }
+                    object objvalue = value;
+                    DataValue m_value = new DataValue()
+                    {
+                        WrappedValue = value,
+                        SourceTimestamp = DateTime.Now,
+                        Value = objvalue
+                    };
+
+                    valueToWrite.Value = m_value;
                     valueToWrite.Value.StatusCode = StatusCodes.Good;
                     valueToWrite.Value.ServerTimestamp = DateTime.MinValue;
                     valueToWrite.Value.SourceTimestamp = DateTime.MinValue;
