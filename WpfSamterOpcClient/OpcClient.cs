@@ -19,10 +19,10 @@ namespace WpfSamterOpcClient
         public readonly string run = "run";
         public readonly string stop = "stop";
         public readonly string speed = "speed";
-        public readonly string orderId = "orderId";
+        public readonly string jobOrder = "jobOrder";
         public readonly string orderComplate = "orderComplate";
-        public readonly string quantity = "count";
-        public readonly string orderQuantity = "orderCount";
+        public readonly string quantity = "prodQuantity";
+        public readonly string orderQuantity = "orderQuantity";
 
         private Session session = null;
         private ApplicationConfiguration config;
@@ -55,7 +55,7 @@ namespace WpfSamterOpcClient
                 subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 Debug.WriteLine("Step 5 - Add a list of items you wish to monitor to the subscription.");
-                string[] item = { run, stop, speed, orderId, orderComplate, quantity, orderQuantity };
+                string[] item = { run, stop, speed, jobOrder, orderComplate, quantity, orderQuantity };
 
                 for (int i = 0; i < item.Length; i++)
                 {

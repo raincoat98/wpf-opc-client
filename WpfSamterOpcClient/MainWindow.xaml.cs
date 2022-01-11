@@ -102,7 +102,7 @@ namespace WpfSamterOpcClient
                 }
 
                 //orderId
-                if (itemId == opcClient.orderId)
+                if (itemId == opcClient.jobOrder)
                 {
                     TbOrderIdValue.Text = value;
                 }
