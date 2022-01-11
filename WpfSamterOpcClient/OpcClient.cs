@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Windows;
 using Opc.Ua;
 using Opc.Ua.Client;
 
@@ -20,9 +21,11 @@ namespace WpfSamterOpcClient
         public readonly string stop = "stop";
         public readonly string speed = "speed";
         public readonly string jobOrder = "jobOrder";
+        public readonly string articleCode = "articleCode";
         public readonly string orderComplate = "orderComplate";
         public readonly string quantity = "prodQuantity";
         public readonly string orderQuantity = "orderQuantity";
+
 
         private Session session = null;
         private ApplicationConfiguration config;
@@ -55,7 +58,7 @@ namespace WpfSamterOpcClient
                 subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 Debug.WriteLine("Step 5 - Add a list of items you wish to monitor to the subscription.");
-                string[] item = { run, stop, speed, jobOrder, orderComplate, quantity, orderQuantity };
+                string[] item = { run, stop, speed, jobOrder, articleCode, orderComplate, quantity, orderQuantity };
 
                 for (int i = 0; i < item.Length; i++)
                 {
@@ -78,6 +81,8 @@ namespace WpfSamterOpcClient
             }
             catch (Exception e)
             {
+                MessageBox.Show("연결 실패 : kepware가 실행되고 있는지 확인하세요.");
+
                 Debug.WriteLine(e.ToString());
                 return;
             }

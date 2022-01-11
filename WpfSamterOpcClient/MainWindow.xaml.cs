@@ -107,6 +107,12 @@ namespace WpfSamterOpcClient
                     TbOrderIdValue.Text = value;
                 }
 
+                //articleCode
+                if (itemId == opcClient.articleCode)
+                {
+                    TbArticleCodeValue.Text = value;
+                }
+
                 //count
                 if (itemId == opcClient.quantity)
                 {
