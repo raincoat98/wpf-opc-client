@@ -95,6 +95,22 @@ namespace WpfSamterOpcClient
                 if (itemId == opcClient.quantity)
                 {
                     TbQuantityValue.Text = value;
+
+                    string orderQt = opcClient.ReadItemValue(opcClient.orderQuantity).ToString();
+
+                    if (Int32.Parse(value) >= 0)
+                    {
+                        if (Int32.Parse(value) >= Int32.Parse(orderQt))
+                        {
+                            opcClient.WriteItemValue(opcClient.orderComplate, true);
+                            // 버튼 활성화
+                            BtOorderComplate.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            BtOorderComplate.Visibility = Visibility.Hidden;
+                        }
+                    }
                 }
 
                 //orderCount
