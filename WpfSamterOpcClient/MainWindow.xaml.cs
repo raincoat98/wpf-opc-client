@@ -18,6 +18,7 @@ namespace WpfSamterOpcClient
         {
             InitializeComponent();
             main = this;
+            this.FontFamily = new FontFamily("Consolas");
         }
         OpcClient opcClient = new OpcClient();
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
