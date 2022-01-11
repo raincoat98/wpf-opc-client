@@ -100,7 +100,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Error: " FontSize="18" VerticalAlignment="Center" Grid.Column="0" />
-                <TextBlock x:Name="TbErrorValue FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Grid.Column="1"/>
+                <TextBlock x:Name="TbErrorValue" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Grid.Column="1"/>
             </Grid>
         </Grid>
         <Grid Grid.Row="3">
