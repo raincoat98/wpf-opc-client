@@ -27,10 +27,16 @@ namespace WpfSamterOpcClient
         public readonly string orderQuantity = "orderQuantity";
 
 
-        private Session session = null;
+        private Session m_session = null;
         private ApplicationConfiguration config;
         private MonitoredItem monitoredItem;
         private Subscription subscription;
+
+        private SessionReconnectHandler m_reconnectHandler;
+        private EventHandler m_ReconnectStarting;
+        private EventHandler m_KeepAliveComplete;
+        private EventHandler m_ReconnectComplete;
+        private int  m_reconnectPeriod = 60;
 
         /* 출처 https://m.blog.naver.com/yeo2697/222083701071*/
         public async Task Opcua_start(string endPointUrl)
@@ -43,19 +49,21 @@ namespace WpfSamterOpcClient
 
                 // Create Session
                 Debug.WriteLine("Step 2 - Create a session with your server.");
-                session = await Session.Create(config, new ConfiguredEndpoint(null, new EndpointDescription(endPointUrl)), true, "", 60000, null, null);
+                m_session = await Session.Create(config, new ConfiguredEndpoint(null, new EndpointDescription(endPointUrl)), true, "", 60000, null, null);
+                m_session.KeepAlive += new KeepAliveEventHandler(Session_KeepAlive);
+
 
                 // Browse Session
                 Debug.WriteLine("Step 3 - Browse the server namespace.");
                 ReferenceDescriptionCollection refs;
                 Byte[] cp;
-                session.Browse(null, null, ObjectIds.ObjectsFolder, 0u, BrowseDirection.Forward, ReferenceTypeIds.HierarchicalReferences, true, (uint)NodeClass.Variable | (uint)NodeClass.Object | (uint)NodeClass.Method, out cp, out refs);
+                m_session.Browse(null, null, ObjectIds.ObjectsFolder, 0u, BrowseDirection.Forward, ReferenceTypeIds.HierarchicalReferences, true, (uint)NodeClass.Variable | (uint)NodeClass.Object | (uint)NodeClass.Method, out cp, out refs);
 
                 MainWindow.main.SetConnectItemValue();
 
                 // Create Subscription
                 Debug.WriteLine("Step 4 - Create a subscription. Set a faster publishing interval if you wish.");
-                subscription = new Subscription(session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
+                subscription = new Subscription(m_session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 Debug.WriteLine("Step 5 - Add a list of items you wish to monitor to the subscription.");
                 string[] item = { run, stop, speed, jobOrder, articleCode, orderComplate, quantity, orderQuantity };
@@ -75,7 +83,7 @@ namespace WpfSamterOpcClient
 
                 Debug.WriteLine("Step 6 - Add the subscription to the session.");
                 // session에 subscription 추가
-                session.AddSubscription(subscription);
+                m_session.AddSubscription(subscription);
                 // subscription 생성
                 subscription.Create();
             }
@@ -88,9 +96,83 @@ namespace WpfSamterOpcClient
             }
         }
 
+        private void Server_ReconnectComplete(object sender, EventArgs e)
+        {
+            try
+            {
+                Debug.WriteLine("reconnect Complate"); 
+                
+                // ignore callbacks from discarded objects.
+                if (!Object.ReferenceEquals(sender, m_reconnectHandler))
+                {
+                    return;
+                }
+
+                m_session = m_reconnectHandler.Session;
+                m_reconnectHandler.Dispose();
+                m_reconnectHandler = null;
+
+                // raise any additional notifications.
+                if (m_ReconnectComplete != null)
+                {
+                    m_ReconnectComplete(this, e);
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(String.Format("[OPC UA Reconnect ERROR][Function] {0}",  exception));
+            }
+        }
+
+        private void Session_KeepAlive(Session session, KeepAliveEventArgs e)
+        {
+            try
+            {
+                // check for events from discarded sessions.
+                if (!Object.ReferenceEquals(session, m_session))
+                {
+                    return;
+                }
+
+                // start reconnect sequence on communication error.
+                if (ServiceResult.IsBad(e.Status))
+                {
+                    if (m_reconnectPeriod <= 0)
+                    {
+                        Debug.WriteLine(String.Format("[Reconncet ERROR] {0}", e.Status));
+                        return;
+                    }
+
+                    Debug.WriteLine(String.Format("[Reconnceting] {0}s", m_reconnectPeriod));
+
+                    if (m_reconnectHandler == null)
+                    {
+                        if (m_ReconnectStarting != null)
+                        {
+                            m_ReconnectStarting(this, e);
+                        }
+
+                        m_reconnectHandler = new SessionReconnectHandler();
+                        m_reconnectHandler.BeginReconnect(m_session, m_reconnectPeriod * 1000, Server_ReconnectComplete);
+                    }
+
+                    return;
+                }
+
+                // raise any additional notifications.
+                if (m_KeepAliveComplete != null)
+                {
+                    m_KeepAliveComplete(this, e);
+                }
+            }
+            catch (Exception exception)
+            {
+            }
+        }
+
         public void Disconnect()
         {
-            session.Dispose();
+            m_session.Dispose();
             MainWindow.main.InitItemValue();
         }
 
@@ -158,7 +240,7 @@ namespace WpfSamterOpcClient
             DiagnosticInfoCollection diagnosticInfos = null;
             itemToRead.AttributeId = Attributes.Value;
 
-            ResponseHeader responseHeader = session.Read(
+            ResponseHeader responseHeader = m_session.Read(
                 null,
                 0,
                 TimestampsToReturn.Both,
@@ -181,7 +263,7 @@ namespace WpfSamterOpcClient
         // item 값 수정 시 사용
         public void WriteItemValue(string itemId, dynamic value)
         {
-            if(session != null)
+            if(m_session != null)
             {
                 try
                 {
@@ -219,7 +301,7 @@ namespace WpfSamterOpcClient
                     StatusCodeCollection results = null;
                     DiagnosticInfoCollection diagnosticInfos = null;
 
-                    session.Write(
+                    m_session.Write(
                         null,
                         valuesToWrite,
                         out results,
