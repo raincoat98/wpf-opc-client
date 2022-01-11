@@ -44,10 +44,10 @@
                             <ColumnDefinition Width="380"/>
                             <ColumnDefinition Width="auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="TbArticleCodeValue" Text="Article Code: " FontSize="18" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="0" />
+                        <TextBlock Text="Article Code: " FontSize="18" TextAlignment="Center" VerticalAlignment="Center" Grid.Column="0" />
 
                         <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
-                            <TextBlock  FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
+                            <TextBlock x:Name="TbArticleCodeValue" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
                         </materialDesign:Card>
                     </Grid>
                 </StackPanel>
