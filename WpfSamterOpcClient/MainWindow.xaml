@@ -17,8 +17,8 @@
         <Grid Grid.Row="0">
             <Label Content="ServerURL" HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" FontSize="20"/>
             <TextBox x:Name="TbServerURLValue" HorizontalAlignment="Left" Margin="155,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Width="280" FontSize="20" Cursor="IBeam"/>
-            <Button x:Name="BtConnectValue" Content="Connect" HorizontalAlignment="Left" Margin="450,37,0,0" VerticalAlignment="Top"/>
-            <Button x:Name="BtDisConnectValue" Content="DisConnect" HorizontalAlignment="Left" Margin="545,37,0,0" VerticalAlignment="Top" Background="#444" IsEnabled="False" />
+            <Button x:Name="BtConnectValue" Content="Connect" HorizontalAlignment="Left" Margin="450,37,0,0" VerticalAlignment="Top" Click="btnConnect_Click"/>
+            <Button x:Name="BtDisConnectValue" Content="DisConnect" HorizontalAlignment="Left" Margin="545,37,0,0" VerticalAlignment="Top" Background="#444" IsEnabled="False" Click="btnDisConnect_Click"  />
             <Label x:Name="LbConnectStatusValue" Content="Not Connected" HorizontalAlignment="Left" Margin="665,41,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.519,1.128"/>
         </Grid>
         <Grid Grid.Row="1" >

@@ -24,7 +24,7 @@ namespace WpfSamterOpcClient
         public readonly string quantity = "count";
         public readonly string orderQuantity = "orderCount";
 
-        public Session session;
+        private Session session = null;
         private ApplicationConfiguration config;
         private MonitoredItem monitoredItem;
         private Subscription subscription;
@@ -81,6 +81,12 @@ namespace WpfSamterOpcClient
                 Debug.WriteLine(e.ToString());
                 return;
             }
+        }
+
+        public void Disconnect()
+        {
+            session.Dispose();
+            MainWindow.main.InitItemValue();
         }
 
         // 인증서

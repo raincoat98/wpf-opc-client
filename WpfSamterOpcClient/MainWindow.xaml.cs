@@ -25,8 +25,19 @@ namespace WpfSamterOpcClient
         {
             Debug.WriteLine("start");
             InitItemValue();
-            Task.Run(() => opcClient.Opcua_start("opc.tcp://127.0.0.1:49320"));
         }
+
+        private void btnConnect_Click(object sender, RoutedEventArgs e)
+        {
+            string serverUrl = TbServerURLValue.Text;
+            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{serverUrl}:49320"));
+        }
+        private void btnDisConnect_Click(object sender, RoutedEventArgs e)
+        {
+            opcClient.Disconnect();
+        }
+
+
         private void BtOorderComplate_Click(object sender, RoutedEventArgs e)
         {
             opcClient.WriteItemValue(opcClient.quantity, 0);
