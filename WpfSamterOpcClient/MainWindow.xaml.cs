@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -21,10 +23,20 @@ namespace WpfSamterOpcClient
             this.FontFamily = new FontFamily("Consolas");
         }
         OpcClient opcClient = new OpcClient();
+        public string KEPSERVER_PATH = "127.0.0.1";
+
+        private static string DATA_PATH = AppDomain.CurrentDomain.BaseDirectory + @"\Data";
+        private static string DATAFILE_PATH = DATA_PATH + "\\Data.txt";
+
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+
+
             Debug.WriteLine("start");
             InitItemValue();
+
+            //설정파일 생성
+            createInfoFile();
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -47,7 +59,7 @@ namespace WpfSamterOpcClient
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                TbServerURLValue.Text = "127.0.0.1";
+                TbServerURLValue.Text = KEPSERVER_PATH;
 
                 BtConnectValue.IsEnabled = true;
                 BtDisConnectValue.IsEnabled = false;
@@ -143,5 +155,47 @@ namespace WpfSamterOpcClient
 
             }));
         }
+        public void createInfoFile()
+        {
+            try
+            {
+                //프로그램 실행시 Data 폴더 확인 및 없을경우 Data 폴더 생성
+                DirectoryInfo di = new DirectoryInfo(DATA_PATH);
+                if (!di.Exists) { di.Create(); }
+
+                FileInfo file = new FileInfo(DATAFILE_PATH);
+                if (!file.Exists)  //해당 파일이 없으면 생성하고 파일 닫기
+                {
+
+                    // 단순히 해당 파일에 내용을 저장하고자 할 때 (기존 내용 초기화 O)
+                    FileStream fs = file.OpenWrite();
+                    TextWriter tw = new StreamWriter(fs);
+                    JObject kepwareSpec = new JObject(new JProperty("ip", $"{KEPSERVER_PATH}"));
+                    tw.Write(kepwareSpec);
+                    tw.Close();
+                    fs.Close();
+                    setServerURL(KEPSERVER_PATH);
+                }
+                else
+                {
+                    string textValue = File.ReadAllText(DATAFILE_PATH);
+                    JObject jObject = JObject.Parse(textValue.Trim());
+                    setServerURL((string)jObject["ip"]);
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+
+            }
+        }
+
+        public void setServerURL( string value)
+        {
+            KEPSERVER_PATH = value;
+        }
+
     }
 }
