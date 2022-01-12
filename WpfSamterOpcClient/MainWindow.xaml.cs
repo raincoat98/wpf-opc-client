@@ -249,6 +249,27 @@ namespace WpfSamterOpcClient
         {
             KEPSERVER_PATH = value;
         }
+        
+        //시작 프로그램에 등록되어 있는지 확인.
+        public bool IsWindowStartUp()
+        {
+            using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+            {
+                try
+                {
+                    if (rk.GetValue(strAppName) != null)
+                    {
+                        return true;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show("오류: " + ex.Message.ToString());
+                }
+            }
+            return false;
+        }
 
         // autoConnect 버튼이 클릭 되어 있는지 확인.
         public bool IsAutoConnect()
@@ -283,7 +304,88 @@ namespace WpfSamterOpcClient
                 this.Show();
                 this.WindowState = WindowState.Normal;
             };
+            ni.ContextMenu = SetContextMenu(ni);
         }
 
+        private ContextMenu SetContextMenu(NotifyIcon ni)
+        {
+            // ContextMenu 생성합니다.
+            ContextMenu menu = new ContextMenu();
+            MenuItem item1 = new MenuItem();
+            item1.Text = "windows startUp";
+
+            //시작 프로그램 등록 확인
+            if (IsWindowStartUp())
+            {
+                item1.Checked = true;
+            } else
+            {
+                item1.Checked = false;
+            }
+
+            item1.Click += delegate (object click, EventArgs eventArgs)
+            {
+                if (item1.Checked == false)
+                {
+                    item1.Checked = true;
+                    using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        try
+                        {
+                            Debug.WriteLine(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                            //레지스트리 등록
+                            if (rk.GetValue(strAppName) == null)
+                            {
+                                rk.SetValue(strAppName, System.Reflection.Assembly.GetExecutingAssembly().Location.ToString());
+                            }
+                            rk.Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Windows.MessageBox.Show("오류: " + ex.Message.ToString());
+                        }
+                    }
+                }
+                else
+                {
+                    item1.Checked = false;
+
+                    using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        try
+                        {
+                            //레지스트리 삭제
+                            if (rk.GetValue(strAppName) != null)
+                            {
+                                rk.DeleteValue(strAppName, false);
+                            }
+                            rk.Close();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Windows.MessageBox.Show("오류: " + ex.Message.ToString());
+                        }
+                    }
+                }
+            };
+            menu.MenuItems.Add(item1);
+
+           
+            MenuItem item2 = new MenuItem();
+            item2.Text = "Exit";
+
+            item2.Click += delegate (object click, EventArgs eventArgs)
+            {
+                // 프로그램을 강제로 종료하는 부분입니다.
+                System.Windows.Application.Current.Shutdown();
+
+                // 프로그램 종료 후 NotifyIcoy 리소스를 해제합니다.
+                // 해제하지 않을 경우 프로그램이 완전히 종료되지 않는 경우도 발생합니다.
+                ni.Dispose();
+            };
+            menu.MenuItems.Add(item2);
+
+            return menu;
+        }
     }
 }
