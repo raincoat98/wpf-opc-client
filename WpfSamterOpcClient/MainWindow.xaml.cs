@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Win32;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -23,6 +24,7 @@ namespace WpfSamterOpcClient
             this.FontFamily = new FontFamily("Consolas");
         }
         OpcClient opcClient = new OpcClient();
+        string strAppName = "SamterOpcClient";
         public string KEPSERVER_PATH = "127.0.0.1";
 
         private static string DATA_PATH = AppDomain.CurrentDomain.BaseDirectory + @"\Data";
@@ -33,10 +35,10 @@ namespace WpfSamterOpcClient
 
 
             Debug.WriteLine("start");
-            InitItemValue();
 
             //설정파일 생성
             createInfoFile();
+            InitItemValue();
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -53,6 +55,44 @@ namespace WpfSamterOpcClient
         private void BtOorderComplate_Click(object sender, RoutedEventArgs e)
         {
             opcClient.WriteItemValue(opcClient.quantity, 0);
+        }
+
+        private void ChkAutoConnect_Checked(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine(ChkAutoConnect.IsEnabled);
+
+            if (IsAutoConnect() == false)
+            {
+                MessageBox.Show("프로그램을 자동으로 연결합니다.");
+
+                using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\SamterOpcClient", true))
+                {
+                    try
+                    {
+                        //레지스트리 등록...
+                        rk.SetValue("autoConnect", true);
+
+                        //레지스트리 닫기...
+                        rk.Close();
+
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("오류: " + ex.Message.ToString());
+                    }
+                }
+            }
+            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
+        }
+
+        private void ChkAutoConnect_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (IsAutoConnect() == true)
+            {
+                Registry.CurrentUser.DeleteSubKey(@"SOFTWARE\SamterOpcClient");
+            }
+            opcClient.Disconnect();
         }
 
         public void InitItemValue()
@@ -74,6 +114,16 @@ namespace WpfSamterOpcClient
                 TbQuantityValue.Text = "0";
                 TbOrderQuantityValue.Text = "0";
 
+
+                //자동 연결 확인
+                if (IsAutoConnect())
+                {
+                    ChkAutoConnect.IsChecked = true;
+                }
+                else
+                {
+                    ChkAutoConnect.IsChecked = false;
+                }
             }));
         }
 
@@ -192,10 +242,29 @@ namespace WpfSamterOpcClient
             }
         }
 
-        public void setServerURL( string value)
+        public void setServerURL(string value)
         {
             KEPSERVER_PATH = value;
         }
 
+        // autoConnect 버튼이 클릭 되어 있는지 확인.
+        public bool IsAutoConnect()
+        {
+            using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\SamterOpcClient", true))
+            {
+                try
+                {
+                    if (rk != null)
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("오류: " + ex.Message.ToString());
+                }
+            }
+            return false;
+        }
     }
 }

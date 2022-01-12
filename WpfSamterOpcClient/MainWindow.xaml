@@ -105,7 +105,7 @@
         </Grid>
         <Grid Grid.Row="3">
             <Label HorizontalAlignment="Right"  VerticalAlignment="center">
-                <CheckBox Content="AutoConnect"/>
+                <CheckBox x:Name="ChkAutoConnect" Content="AutoConnect" Checked="ChkAutoConnect_Checked" Unchecked="ChkAutoConnect_Unchecked"/>
             </Label>
         </Grid>
     </Grid>
