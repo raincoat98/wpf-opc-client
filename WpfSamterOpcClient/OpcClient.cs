@@ -22,7 +22,7 @@ namespace WpfSamterOpcClient
         public readonly string speed = "speed";
         public readonly string jobOrder = "jobOrder";
         public readonly string articleCode = "articleCode";
-        public readonly string orderComplate = "orderComplate";
+        public readonly string orderComplete = "orderComplete";
         public readonly string quantity = "prodQuantity";
         public readonly string orderQuantity = "orderQuantity";
 
@@ -66,7 +66,7 @@ namespace WpfSamterOpcClient
                 subscription = new Subscription(m_session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 Debug.WriteLine("Step 5 - Add a list of items you wish to monitor to the subscription.");
-                string[] item = { run, stop, speed, jobOrder, articleCode, orderComplate, quantity, orderQuantity };
+                string[] item = { run, stop, speed, jobOrder, articleCode, orderComplete, quantity, orderQuantity };
 
                 for (int i = 0; i < item.Length; i++)
                 {
@@ -100,7 +100,7 @@ namespace WpfSamterOpcClient
         {
             try
             {
-                Debug.WriteLine("reconnect Complate"); 
+                Debug.WriteLine("reconnect Complete"); 
                 
                 // ignore callbacks from discarded objects.
                 if (!Object.ReferenceEquals(sender, m_reconnectHandler))

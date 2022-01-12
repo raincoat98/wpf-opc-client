@@ -55,7 +55,7 @@ namespace WpfSamterOpcClient
         }
 
 
-        private void BtOorderComplate_Click(object sender, RoutedEventArgs e)
+        private void BtOrderComplete_Click(object sender, RoutedEventArgs e)
         {
             opcClient.WriteItemValue(opcClient.quantity, 0);
         }
@@ -187,13 +187,13 @@ namespace WpfSamterOpcClient
 
                     if ((Int32.Parse(value) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
                     {
-                        opcClient.WriteItemValue(opcClient.orderComplate, true);
+                        opcClient.WriteItemValue(opcClient.orderComplete, true);
                         // 버튼 활성화
-                        BtOorderComplate.Visibility = Visibility.Visible;
+                        BtOorderComplete.Visibility = Visibility.Visible;
                     }
                     else
                     {
-                        BtOorderComplate.Visibility = Visibility.Hidden;
+                        BtOorderComplete.Visibility = Visibility.Hidden;
                     }
                 }
 

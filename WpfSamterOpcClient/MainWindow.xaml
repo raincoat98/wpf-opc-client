@@ -36,7 +36,7 @@
                         <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
                             <TextBlock x:Name="TbOrderIdValue" Text="none..." FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
                         </materialDesign:Card>
-                        <Button x:Name="BtOorderComplate" Content="Order Complate" Grid.Column="2" Margin="5,0,0,0"  Click="BtOorderComplate_Click" />
+                        <Button x:Name="BtOorderComplete" Content="Order Complete" Grid.Column="2" Margin="5,0,0,0"  Click="BtOrderComplete_Click" Visibility="Hidden"/>
                     </Grid>
                     <Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions >
