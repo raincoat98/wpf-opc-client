@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
 
 
@@ -39,6 +40,8 @@ namespace WpfSamterOpcClient
             //설정파일 생성
             createInfoFile();
             InitItemValue();
+
+            SetNotification();
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -63,7 +66,7 @@ namespace WpfSamterOpcClient
 
             if (IsAutoConnect() == false)
             {
-                MessageBox.Show("프로그램을 자동으로 연결합니다.");
+                System.Windows.MessageBox.Show("프로그램을 자동으로 연결합니다.");
 
                 using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\SamterOpcClient", true))
                 {
@@ -79,7 +82,7 @@ namespace WpfSamterOpcClient
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("오류: " + ex.Message.ToString());
+                        System.Windows.MessageBox.Show("오류: " + ex.Message.ToString());
                     }
                 }
             }
@@ -261,10 +264,26 @@ namespace WpfSamterOpcClient
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("오류: " + ex.Message.ToString());
+                    System.Windows.MessageBox.Show("오류: " + ex.Message.ToString());
                 }
             }
             return false;
         }
+
+        private void SetNotification()
+        {
+            // 트레이 아이콘 생성
+            NotifyIcon ni = new NotifyIcon();
+            ni.Icon = Properties.Resources.myicon;
+            ni.Visible = true;
+            ni.Text = "SamterOpcClient";
+
+            ni.DoubleClick += delegate (object sender, EventArgs eventArgs)
+            {
+                this.Show();
+                this.WindowState = WindowState.Normal;
+            };
+        }
+
     }
 }
