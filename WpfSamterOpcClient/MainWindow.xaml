@@ -11,12 +11,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Label Content="ServerURL" HorizontalAlignment="Left" Margin="50,0,0,0" VerticalAlignment="Center" FontSize="20"/>
-            <TextBox x:Name="TbServerURLValue" HorizontalAlignment="Left" Margin="155,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" Width="280" FontSize="20" Cursor="IBeam"/>
+            <TextBox x:Name="TbServerURLValue" HorizontalAlignment="Left" Margin="155,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Center" TextAlignment="Center" Width="280" FontSize="20" Cursor="IBeam"/>
             <Button x:Name="BtConnectValue" Content="Connect" HorizontalAlignment="Left" Margin="450,37,0,0" VerticalAlignment="Top" Click="btnConnect_Click"/>
             <Button x:Name="BtDisConnectValue" Content="DisConnect" HorizontalAlignment="Left" Margin="545,37,0,0" VerticalAlignment="Top" Background="#444" IsEnabled="False" Click="btnDisConnect_Click"  />
             <Label x:Name="LbConnectStatusValue" Content="Not Connected" HorizontalAlignment="Left" Margin="665,41,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.519,1.128"/>
@@ -38,7 +38,7 @@
                         </materialDesign:Card>
                         <Button x:Name="BtOorderComplete" Content="Order Complete" Grid.Column="2" Margin="5,0,0,0"  Click="BtOrderComplete_Click" Visibility="Hidden"/>
                     </Grid>
-                    <Grid Margin="0,10,0,0">
+                    <Grid Margin="0,10,0,10">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="150"/>
                             <ColumnDefinition Width="380"/>
@@ -89,22 +89,36 @@
 
                 </WrapPanel>
             </StackPanel>
- 
+
 
         </Grid>
         <Grid Grid.Row="2">
-            <Grid Margin="50, 0, 50,0" >
-                <Grid.ColumnDefinitions >
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="400"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Error: " FontSize="18" VerticalAlignment="Center" Grid.Column="0" />
-                <TextBlock x:Name="TbErrorValue" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Grid.Column="1"/>
-            </Grid>
+            <StackPanel Margin="50, 0, 50, 0" VerticalAlignment="Center">
+                <Grid  >
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="380"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="orderStartDt" Text="order StartDt: " FontSize="14" VerticalAlignment="Center" Grid.Column="0" />
+                    <TextBlock x:Name="orderStartDtValue" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Grid.Column="1"/>
+                </Grid>
+                <Grid Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="380"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="orderEndDt" Text="order EndDt: " FontSize="14" VerticalAlignment="Center" Grid.Column="0"/>
+                    <TextBlock x:Name="orderEndDtValue" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Grid.Column="1" />
+                </Grid>
+            </StackPanel>
         </Grid>
         <Grid Grid.Row="3">
-            <Label HorizontalAlignment="Right"  VerticalAlignment="center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Label HorizontalAlignment="Right"  VerticalAlignment="Center" Grid.Column="1">
                 <CheckBox x:Name="ChkAutoConnect" Content="AutoConnect" Checked="ChkAutoConnect_Checked" Unchecked="ChkAutoConnect_Unchecked"/>
             </Label>
         </Grid>
