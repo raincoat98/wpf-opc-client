@@ -143,14 +143,14 @@ namespace WpfSamterOpcClient
                     //작업 시작시간
                     if (Int32.Parse(value) == ORDER_START_VALUE)
                     {
-                        orderStartDtValue.Text = DateTime.Now.ToString();
-                        opcClient.WriteItemValue(opcClient.orderStartDt, DateTime.Now);
+                        startDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
+                        opcClient.WriteItemValue(opcClient.startDTTM, DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
                      //작업 종료시간
                     if ((Int32.Parse(value) > 0) && Int32.Parse(value) == Int32.Parse(orderQt))
                     {
-                        orderEndDtValue.Text = DateTime.Now.ToString();
-                        opcClient.WriteItemValue(opcClient.orderEndDt, DateTime.Now);
+                        endDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
+                        opcClient.WriteItemValue(opcClient.endDTTM, DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
                     }
 
 
