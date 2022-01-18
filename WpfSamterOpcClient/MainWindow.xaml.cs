@@ -33,60 +33,25 @@ namespace WpfSamterOpcClient
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
-
             Debug.WriteLine("start");
 
             //설정파일 생성
             createInfoFile();
             InitItemValue();
-
             SetNotification();
+ 
+            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
+
         }
 
-        private void btnConnect_Click(object sender, RoutedEventArgs e)
+        private void btnReConnect_Click(object sender, RoutedEventArgs e)
         {
-            string serverUrl = TbServerURLValue.Text;
-            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{serverUrl}:49320"));
+            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
         }
-        private void btnDisConnect_Click(object sender, RoutedEventArgs e)
-        {
-            opcClient.Disconnect();
-        }
-
 
         private void BtOrderComplete_Click(object sender, RoutedEventArgs e)
         {
             opcClient.WriteItemValue(opcClient.quantity, 0);
-        }
-
-        private void ChkAutoConnect_Checked(object sender, RoutedEventArgs e)
-        {
-            Debug.WriteLine(ChkAutoConnect.IsEnabled);
-
-            if (IsAutoConnect() == false)
-            {
-                System.Windows.MessageBox.Show("프로그램을 자동으로 연결합니다.");
-
-                using (RegistryKey rk = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\SamterOpcClient", true))
-                {
-                    try
-                    {
-                        //레지스트리 등록...
-                        rk.SetValue("autoConnect", true);
-
-                        //레지스트리 닫기...
-                        rk.Close();
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Windows.MessageBox.Show("오류: " + ex.Message.ToString());
-                    }
-                }
-            }
-            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
         }
 
         private void ChkAutoConnect_Unchecked(object sender, RoutedEventArgs e)
@@ -102,31 +67,20 @@ namespace WpfSamterOpcClient
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                TbServerURLValue.Text = KEPSERVER_PATH;
+                BtReConnect.IsEnabled = true;
+                LbConnectStatusValue.Content = "DisConnected";
+                LbConnectStatusValue.Foreground = Brushes.Red;
 
-                BtConnectValue.IsEnabled = true;
-                BtDisConnectValue.IsEnabled = false;
-                LbConnectStatusValue.Content = "Not Connect";
 
                 TbStatusValue.Text = "STOP";
                 TbStatusValue.Foreground = Brushes.Red;
 
                 TbSpeedValue.Text = "0";
-                TbOrderIdValue.Text = "none....";
+                TbOrderIdValue.Text = "";
+                TbOrderIdValue.Text = "";
 
                 TbQuantityValue.Text = "0";
                 TbOrderQuantityValue.Text = "0";
-
-
-                //자동 연결 확인
-                if (IsAutoConnect())
-                {
-                    ChkAutoConnect.IsChecked = true;
-                }
-                else
-                {
-                    ChkAutoConnect.IsChecked = false;
-                }
             }));
         }
 
@@ -134,9 +88,9 @@ namespace WpfSamterOpcClient
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
-                BtConnectValue.IsEnabled = false;
-                BtDisConnectValue.IsEnabled = true;
-                LbConnectStatusValue.Content = "Connect";
+                BtReConnect.IsEnabled = false;
+                LbConnectStatusValue.Content = "Connected";
+                LbConnectStatusValue.Foreground = Brushes.LightGreen;
 
             }));
         }
@@ -150,8 +104,8 @@ namespace WpfSamterOpcClient
                 {
                     if (value.Equals("True"))
                     {
-                        TbStatusValue.Text = "START";
-                        TbStatusValue.Foreground = Brushes.Green;
+                        TbStatusValue.Text = "RUN";
+                        TbStatusValue.Foreground = Brushes.LightGreen;
                     }
                     else
                     {
@@ -200,7 +154,7 @@ namespace WpfSamterOpcClient
                     }
 
 
-                    if ((Int32.Parse(value) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
+                    if ((Int32.Parse(value) > 0 && Int32.Parse(orderQt) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
                     {
                         opcClient.WriteItemValue(opcClient.orderComplete, true);
                         // 버튼 활성화

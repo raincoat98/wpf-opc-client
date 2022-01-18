@@ -91,7 +91,7 @@ namespace WpfSamterOpcClient
             }
             catch (Exception e)
             {
-                MessageBox.Show("연결 실패 : kepware가 실행되고 있는지 확인하세요.");
+                MessageBox.Show("Connection failed: Please check the server status and reconnect.");
 
                 Debug.WriteLine(e.ToString());
                 return;
