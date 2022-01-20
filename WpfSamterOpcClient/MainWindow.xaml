@@ -103,7 +103,7 @@
             <StackPanel Margin="50, 0, 50, 0" VerticalAlignment="Center">
                 <Grid>
                     <Grid.ColumnDefinitions >
-                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="130"/>
                         <ColumnDefinition Width="380"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
@@ -112,12 +112,21 @@
                 </Grid>
                 <Grid Margin="0, 10, 0, 0">
                     <Grid.ColumnDefinitions >
-                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="130"/>
                         <ColumnDefinition Width="311"/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="endDt" Text="END DTTM: " FontSize="14" VerticalAlignment="Top" Grid.Column="0"/>
+                    <TextBlock x:Name="endDt" Text="END DTTM: " FontSize="14" Grid.Column="0"/>
                     <TextBlock x:Name="endDtValue" FontSize="14" VerticalAlignment="Center" Grid.Column="1"/>
+                </Grid>
+                <Grid Margin="0, 10, 0, 0">
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="311"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="processingTime" Text="Processing Time: " FontSize="14" Grid.Column="0"/>
+                    <TextBlock x:Name="processingTimeValue" FontSize="14" VerticalAlignment="Center" Grid.Column="1"/>
                 </Grid>
             </StackPanel>
         </Grid>

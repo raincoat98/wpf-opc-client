@@ -140,17 +140,19 @@ namespace WpfSamterOpcClient
                     int ORDER_START_VALUE = 1;
                     string orderQt = opcClient.ReadItemValue(opcClient.orderQuantity).ToString();
 
+                    string dateNowUTC = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
                     //작업 시작시간
                     if (Int32.Parse(value) == ORDER_START_VALUE)
                     {
-                        startDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
-                        opcClient.WriteItemValue(opcClient.startDTTM, DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                        startDtValue.Text = dateNowUTC.ToString();
+                        opcClient.WriteItemValue(opcClient.startDTTM, Convert.ToDateTime(dateNowUTC));
                     }
                      //작업 종료시간
                     if ((Int32.Parse(value) > 0) && Int32.Parse(value) == Int32.Parse(orderQt))
                     {
                         endDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
-                        opcClient.WriteItemValue(opcClient.endDTTM, DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+                        opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
                     }
 
 
@@ -159,6 +161,17 @@ namespace WpfSamterOpcClient
                         opcClient.WriteItemValue(opcClient.orderComplete, true);
                         // 버튼 활성화
                         BtOorderComplete.Visibility = Visibility.Visible;
+
+                        // 작업 시간
+                        string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
+                        string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
+
+                        TimeSpan timeDiff = DateTime.Parse(endDt) - DateTime.Parse(startDt);
+
+                        String processingTime = timeDiff.ToString();
+                        processingTimeValue.Text = processingTime;
+                        opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
+
                     }
                     else
                     {

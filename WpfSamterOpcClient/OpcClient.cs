@@ -27,6 +27,7 @@ namespace WpfSamterOpcClient
         public readonly string orderQuantity = "orderQuantity";
         public readonly string startDTTM = "startDTTM";
         public readonly string endDTTM = "endDTTM";
+        public readonly string processingTime = "processingTime";
 
 
         private Session m_session = null;
@@ -68,7 +69,7 @@ namespace WpfSamterOpcClient
                 subscription = new Subscription(m_session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 Debug.WriteLine("Step 5 - Add a list of items you wish to monitor to the subscription.");
-                string[] item = { run, stop, speed, jobOrder, articleCode, orderComplete, quantity, orderQuantity, startDTTM, endDTTM };
+                string[] item = { run, stop, speed, jobOrder, articleCode, orderComplete, quantity, orderQuantity, startDTTM, endDTTM, processingTime };
 
                 for (int i = 0; i < item.Length; i++)
                 {
@@ -252,6 +253,8 @@ namespace WpfSamterOpcClient
 
             ClientBase.ValidateResponse(values, itemsToRead);
             ClientBase.ValidateDiagnosticInfos(diagnosticInfos, itemsToRead);
+
+            Debug.WriteLine(values[0].Value.GetType());
 
             if (StatusCode.IsBad(values[0].StatusCode))
             {
