@@ -279,10 +279,6 @@ namespace WpfSamterOpcClient
                        value = Convert.ToInt32(value);
                     }
 
-                    if (value is String)
-                    {
-                        value = Convert.ToUInt16(value);
-                    }
                     object objvalue = value;
                     DataValue m_value = new DataValue()
                     {
