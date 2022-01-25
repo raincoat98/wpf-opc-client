@@ -159,8 +159,6 @@ namespace WpfSamterOpcClient
                     if ((Int32.Parse(value) > 0 && Int32.Parse(orderQt) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
                     {
                         opcClient.WriteItemValue(opcClient.orderComplete, true);
-                        // 버튼 활성화
-                        BtOorderComplete.Visibility = Visibility.Visible;
 
                         // 작업 시간
                         string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
