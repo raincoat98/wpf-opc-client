@@ -173,10 +173,6 @@ namespace WpfSamterOpcClient
                         opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
 
                     }
-                    else
-                    {
-                        BtOorderComplete.Visibility = Visibility.Hidden;
-                    }
                 }
 
                 //orderCount
