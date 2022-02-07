@@ -30,6 +30,7 @@ namespace WpfSamterOpcClient
 
         private static string DATA_PATH = AppDomain.CurrentDomain.BaseDirectory + @"\Data";
         private static string DATAFILE_PATH = DATA_PATH + "\\Data.txt";
+        private static string LOGFILE_PATH = DATA_PATH + "\\Log.txt";
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -39,7 +40,7 @@ namespace WpfSamterOpcClient
             createInfoFile();
             InitItemValue();
             SetNotification();
- 
+
             Task.Run(() => opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
 
         }
@@ -52,6 +53,15 @@ namespace WpfSamterOpcClient
         private void BtOrderComplete_Click(object sender, RoutedEventArgs e)
         {
             opcClient.WriteItemValue(opcClient.quantity, 0);
+            opcClient.WriteItemValue(opcClient.jobOrder, "0000");
+            opcClient.WriteItemValue(opcClient.articleCode, "A");
+            opcClient.WriteItemValue(opcClient.equipCode, "");
+
+        }
+
+        private void BtSuspendJob_Click(object sender, RoutedEventArgs e)
+        {
+            opcClient.WriteItemValue(opcClient.orderComplete, true);
         }
 
         private void ChkAutoConnect_Unchecked(object sender, RoutedEventArgs e)
@@ -72,12 +82,12 @@ namespace WpfSamterOpcClient
                 LbConnectStatusValue.Foreground = Brushes.Red;
 
 
-                TbStatusValue.Text = "STOP";
+                TbStatusValue.Text = "READY";
                 TbStatusValue.Foreground = Brushes.Red;
 
                 TbSpeedValue.Text = "0";
-                TbOrderIdValue.Text = "";
-                TbOrderIdValue.Text = "";
+                TbOrderIdValue.Text = "0000";
+                TbArticleCodeValue.Text = "A";
 
                 TbQuantityValue.Text = "0";
                 TbOrderQuantityValue.Text = "0";
@@ -97,89 +107,118 @@ namespace WpfSamterOpcClient
 
         public void SetChangeItemValue(string itemId, string value)
         {
-            this.Dispatcher.BeginInvoke(new Action(() =>
+            try
             {
-                //run
-                if (itemId == opcClient.run)
+                this.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    if (value.Equals("True"))
+                    //TODO: switch 문으로 변경
+                    //run
+                    if (itemId == opcClient.run)
                     {
-                        TbStatusValue.Text = "RUN";
-                        TbStatusValue.Foreground = Brushes.LightGreen;
-                    }
-                    else
-                    {
-                        TbStatusValue.Text = "STOP";
-                        TbStatusValue.Foreground = Brushes.Red;
-                    }
-                }
-
-                //speed
-                if (itemId == opcClient.speed)
-                {
-                    TbSpeedValue.Text = value;
-                }
-
-                //orderId
-                if (itemId == opcClient.jobOrder)
-                {
-                    TbOrderIdValue.Text = value;
-                }
-
-                //articleCode
-                if (itemId == opcClient.articleCode)
-                {
-                    TbArticleCodeValue.Text = value;
-                }
-
-                //count
-                if (itemId == opcClient.quantity)
-                {
-                    TbQuantityValue.Text = value;
-
-                    int ORDER_START_VALUE = 1;
-                    string orderQt = opcClient.ReadItemValue(opcClient.orderQuantity).ToString();
-
-                    string dateNowUTC = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    //작업 시작시간
-                    if (Int32.Parse(value) == ORDER_START_VALUE)
-                    {
-                        startDtValue.Text = dateNowUTC.ToString();
-                        opcClient.WriteItemValue(opcClient.startDTTM, Convert.ToDateTime(dateNowUTC));
-                    }
-                     //작업 종료시간
-                    if ((Int32.Parse(value) > 0) && Int32.Parse(value) == Int32.Parse(orderQt))
-                    {
-                        endDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
-                        opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
+                        if (value.Equals("True"))
+                        {
+                            TbStatusValue.Text = "RUN";
+                            TbStatusValue.Foreground = Brushes.LightGreen;
+                        }
+                        else
+                        {
+                            TbStatusValue.Text = "READY";
+                            TbStatusValue.Foreground = Brushes.Red;
+                        }
                     }
 
-
-                    if ((Int32.Parse(value) > 0 && Int32.Parse(orderQt) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
+                    if (itemId == opcClient.stop)
                     {
-                        opcClient.WriteItemValue(opcClient.orderComplete, true);
-
-                        // 작업 시간
-                        string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
-                        string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
-
-                        TimeSpan timeDiff = DateTime.Parse(endDt) - DateTime.Parse(startDt);
-
-                        String processingTime = timeDiff.ToString();
-                        processingTimeValue.Text = processingTime;
-                        opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
-
+                        if (value.Equals("True"))
+                        {
+                            TbStatusValue.Text = "STOP";
+                            TbStatusValue.Foreground = Brushes.Red;
+                        }
                     }
-                }
 
-                //orderCount
-                if (itemId == opcClient.orderQuantity)
-                {
-                    TbOrderQuantityValue.Text = value;
-                }
+                    if (itemId == opcClient.error)
+                    {
+                        if (value.Equals("True"))
+                        {
+                            TbStatusValue.Text = "ERROR";
+                            TbStatusValue.Foreground = Brushes.Red;
+                        }
+         
+                    }
 
-            }));
+                    //speed
+                    if (itemId == opcClient.speed)
+                    {
+                        TbSpeedValue.Text = value;
+                    }
+
+                    //orderId
+                    if (itemId == opcClient.jobOrder)
+                    {
+                        TbOrderIdValue.Text = value;
+                    }
+
+                    //articleCode
+                    if (itemId == opcClient.articleCode)
+                    {
+                        TbArticleCodeValue.Text = value;
+                    }
+
+                    //count
+                    if (itemId == opcClient.quantity)
+                    {
+                        TbQuantityValue.Text = value;
+
+                        int ORDER_START_VALUE = 1;
+                        string orderQt = "0";
+                        orderQt = opcClient.ReadItemValue(opcClient.orderQuantity).ToString();
+
+                        string dateNowUTC = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
+                        //작업 시작시간
+                        if (Int32.Parse(value) == ORDER_START_VALUE)
+                        {
+                            opcClient.WriteItemValue(opcClient.orderComplete, true);
+                            startDtValue.Text = dateNowUTC.ToString();
+                            opcClient.WriteItemValue(opcClient.startDTTM, Convert.ToDateTime(dateNowUTC));
+                        }
+                        //작업 종료시간
+                        if ((Int32.Parse(value) > 0) && Int32.Parse(value) == Int32.Parse(orderQt))
+                        {
+                            endDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
+                            opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
+                        }
+
+
+                        if ((Int32.Parse(value) > 0 && Int32.Parse(orderQt) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
+                        {
+                            opcClient.WriteItemValue(opcClient.orderComplete, true);
+
+                            // 작업 시간
+                            string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
+                            string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
+
+                            TimeSpan timeDiff = DateTime.Parse(endDt) - DateTime.Parse(startDt);
+
+                            String processingTime = timeDiff.ToString();
+                            processingTimeValue.Text = processingTime;
+                            opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
+
+                        }
+                    }
+
+                    //orderCount
+                    if (itemId == opcClient.orderQuantity)
+                    {
+                        TbOrderQuantityValue.Text = value;
+                    }
+
+                }));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
         public void createInfoFile()
         {
@@ -218,11 +257,33 @@ namespace WpfSamterOpcClient
             }
         }
 
+        public void writeLog(string strMsg)
+        {
+            try
+            {
+                Debug.WriteLine(strMsg);
+                DirectoryInfo di = new DirectoryInfo(DATA_PATH);
+                if (!di.Exists) { di.Create(); }
+
+                FileInfo file = new FileInfo(LOGFILE_PATH);
+
+                StreamWriter sw = new StreamWriter(LOGFILE_PATH, true);
+                sw.WriteLine(strMsg);
+                sw.Close();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message.ToString());
+
+            }
+        }
+
         public void setServerURL(string value)
         {
             KEPSERVER_PATH = value;
         }
-        
+
         //시작 프로그램에 등록되어 있는지 확인.
         public bool IsWindowStartUp()
         {
@@ -291,7 +352,8 @@ namespace WpfSamterOpcClient
             if (IsWindowStartUp())
             {
                 item1.Checked = true;
-            } else
+            }
+            else
             {
                 item1.Checked = false;
             }
@@ -343,7 +405,7 @@ namespace WpfSamterOpcClient
             };
             menu.MenuItems.Add(item1);
 
-           
+
             MenuItem item2 = new MenuItem();
             item2.Text = "Exit";
 

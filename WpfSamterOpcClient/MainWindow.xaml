@@ -5,128 +5,124 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:WpfSamterOpcClient"
-        mc:Ignorable="d" Height="450" Width="800" WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        Title="wookilOpcClient" Loaded="MainWindow_Loaded" Foreground="#fff">
+        mc:Ignorable="d" Height="600" Width="1024" WindowStartupLocation="CenterScreen" WindowState="Maximized"
+        Title="wookilOpcClient" Loaded="MainWindow_Loaded" FontFamily="Consolas" FontSize="28" Foreground="#fff" >
     <Grid Background="#242424">
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <StackPanel Margin="50, 0, 50, 0" VerticalAlignment="Center">
-                <Grid  >
-                    <Grid.ColumnDefinitions >
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="100"/>
-                    </Grid.ColumnDefinitions>
-                    <Label Content="Server Status"  FontSize="18" VerticalAlignment="Center" Grid.Column="0" />
-                    <Label x:Name="LbConnectStatusValue" FontSize="18" Content="DisConnected" VerticalAlignment="Center"  Grid.Column="1" />
-                    <Button x:Name="BtReConnect" Content="ReConnect"  VerticalAlignment="Center" Grid.Column="3"  Click="btnReConnect_Click"/>
-                </Grid>
-            </StackPanel>
-        </Grid>
-        <Grid Grid.Row="1" >
-            <StackPanel>
-
-                <StackPanel Margin="50, 0, 50, 15">
-                    <Grid  >
-                        <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="150"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Job Order: " FontSize="18" VerticalAlignment="Center" Grid.Column="0" />
-
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
-                            <TextBlock x:Name="TbOrderIdValue" Text="none..." FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        </materialDesign:Card>
-                        <StackPanel  VerticalAlignment="Center" Grid.Column="2">
-                            <Button x:Name="BtOorderComplete" FontSize="16" FontWeight="SemiBold" Content="Terminate" Width="140" Click="BtOrderComplete_Click" Margin="10,0,0,0" Visibility="Hidden" Cursor="Hand" />
-                        </StackPanel>
-                    </Grid>
-                    <Grid Margin="0,10,0,10">
-                        <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="150"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Article Code: " FontSize="18" VerticalAlignment="Center" Grid.Column="0" />
-
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
-                            <TextBlock x:Name="TbArticleCodeValue" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" />
-                        </materialDesign:Card>
-                    </Grid>
-                </StackPanel>
-
-                <WrapPanel  HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Border Margin="20 0" CornerRadius="15">
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0"
-                                         Width="150" Height="100" >
-                            <StackPanel Margin="20" HorizontalAlignment="Center">
-                                <TextBlock FontSize="14" Text="STATUS" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="TbStatusValue" FontWeight="SemiBold" FontSize="25" Text="STOP" Margin="0 10 0 0" Foreground="#FF0000" />
-                            </StackPanel>
-                        </materialDesign:Card>
-                    </Border>
-                    <Border Margin="20 0" CornerRadius="15">
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" 
-                                         Width="150" Height="100">
-                            <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock FontSize="14" Text="SPEED" HorizontalAlignment="Center"/>
-                                <TextBlock x:Name="TbSpeedValue" HorizontalAlignment="Center" FontWeight="SemiBold" FontSize="25" Text="0" Margin="0 10 0 0" />
-                            </StackPanel>
-                        </materialDesign:Card>
-                    </Border>
-                    <Border Margin="20 0" CornerRadius="15">
-                        <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" 
-                                         Width="250" Height="100">
-                            <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock FontSize="14" Text="Q'ty / Order Q'ty" />
-                                <StackPanel  Margin="0 10 0 0" Orientation="Horizontal"  HorizontalAlignment="Center">
-                                    <TextBlock x:Name="TbQuantityValue" FontWeight="SemiBold" FontSize="25" Text="0"/>
-                                    <TextBlock FontWeight="SemiBold" FontSize="15" Text=" / " Margin="0 10 0 0" />
-                                    <TextBlock x:Name="TbOrderQuantityValue" FontWeight="SemiBold" FontSize="15" Text="0" Margin="0 10 0 0"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </materialDesign:Card>
-                    </Border>
-
-                </WrapPanel>
-            </StackPanel>
-
-
-        </Grid>
-        <Grid Grid.Row="2">
-            <StackPanel Margin="50, 0, 50, 0" VerticalAlignment="Center">
+        <Grid Grid.Row="0" Margin="50,20,50,20">
+            <StackPanel VerticalAlignment="Center">
                 <Grid>
                     <Grid.ColumnDefinitions >
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="380"/>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="startDt" Text="START DTTM: " FontSize="14" VerticalAlignment="Center" Grid.Column="0" />
-                    <TextBlock x:Name="startDtValue" FontSize="14"  VerticalAlignment="Center" Grid.Column="1"/>
+                    <Label Content="Server Status" Margin="0,0,15,0" VerticalAlignment="Center"  Grid.Column="0" />
+                    <Label x:Name="LbConnectStatusValue" Content="DisConnected" VerticalAlignment="Center"  Grid.Column="1"/>
+                    <Button x:Name="BtReConnect" Content="ReConnect" FontSize="20" Height="50" Click="btnReConnect_Click" Grid.Column="3" Cursor="Hand"/>
+                </Grid>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1"  Margin="50,20,50,20">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="*"/>
+                     <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Job Order: " VerticalAlignment="Center" Grid.Column="0" />
+
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
+                        <TextBlock x:Name="TbOrderIdValue" FontSize="20" Text="0000" VerticalAlignment="Center" />
+                    </materialDesign:Card>
+                    <StackPanel  VerticalAlignment="Center" Grid.Column="2">
+                        <Button x:Name="BtOorderComplete" FontWeight="SemiBold" Content="Terminate" FontSize="20" Height="50" Click="BtOrderComplete_Click"  Margin="10,0,0,0" Cursor="Hand" />
+                    </StackPanel>
+                </Grid>
+                <Grid Margin="0,10,0,10">
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="*"/>
+                     <ColumnDefinition Width="200"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Article Code: " VerticalAlignment="Center" Grid.Column="0" />
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
+                        <TextBlock x:Name="TbArticleCodeValue" FontSize="20" Text="A" VerticalAlignment="Center" />
+                    </materialDesign:Card>
+
+                    <StackPanel  VerticalAlignment="Center" Grid.Column="2">
+                        <Button  x:Name="BtSuspendJob" FontWeight="SemiBold" Content="Suspend job" FontSize="20" Height="50" Click="BtSuspendJob_Click"  Margin="10,0,0,0" Cursor="Hand" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2" >
+            <WrapPanel  HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Margin="20 0" CornerRadius="15">
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0"
+                                         Width="160" Height="150" >
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock FontSize="20" Text="STATUS" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="TbStatusValue"  FontWeight="SemiBold" Text="READY" Foreground="#ff9f40" Margin="0 10 0 0" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Border>
+                <Border Margin="20 0" CornerRadius="15">
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" 
+                                         Width="160" Height="150" >
+                        <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock FontSize="20" Text="SPEED" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="TbSpeedValue" FontWeight="SemiBold" Text="0" Margin="0 10 0 0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Border>
+                <Border Margin="20 0" CornerRadius="15">
+                    <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" 
+                                         Width="300" Height="150">
+                        <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock FontSize="18" Text="Q'ty / Order Q'ty" />
+                            <StackPanel  Margin="0 10 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock x:Name="TbQuantityValue" FontWeight="SemiBold" Text="0"/>
+                                <TextBlock FontWeight="SemiBold" FontSize="18" Text=" / " Margin="0 10 0 0" />
+                                <TextBlock x:Name="TbOrderQuantityValue" FontWeight="SemiBold" FontSize="18" Text="0" Margin="0 10 0 0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </Border>
+            </WrapPanel>
+        </Grid>
+        <Grid Grid.Row="3" Margin="50,20,50,20">
+            <StackPanel VerticalAlignment="Center">
+                <Grid>
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="startDt" Text="START DTTM: " FontSize="24" VerticalAlignment="Center" Grid.Column="0" />
+                    <TextBlock x:Name="startDtValue" FontSize="24"  VerticalAlignment="Center" Grid.Column="1"/>
                 </Grid>
                 <Grid Margin="0, 10, 0, 0">
                     <Grid.ColumnDefinitions >
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="311"/>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="endDt" Text="END DTTM: " FontSize="14" Grid.Column="0"/>
-                    <TextBlock x:Name="endDtValue" FontSize="14" VerticalAlignment="Center" Grid.Column="1"/>
+                    <TextBlock x:Name="endDt" Text="END DTTM: " FontSize="24" Grid.Column="0"/>
+                    <TextBlock x:Name="endDtValue" FontSize="24" VerticalAlignment="Center" Grid.Column="1"/>
                 </Grid>
                 <Grid Margin="0, 10, 0, 0">
                     <Grid.ColumnDefinitions >
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="311"/>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="processingTime" Text="Processing Time: " FontSize="14" Grid.Column="0"/>
-                    <TextBlock x:Name="processingTimeValue" FontSize="14" VerticalAlignment="Center" Grid.Column="1"/>
+                    <TextBlock x:Name="processingTime" Text="Processing Time: " FontSize="24" Grid.Column="0"/>
+                    <TextBlock x:Name="processingTimeValue" FontSize="24" VerticalAlignment="Center" Grid.Column="1"/>
                 </Grid>
             </StackPanel>
         </Grid>
