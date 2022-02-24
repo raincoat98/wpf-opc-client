@@ -59,6 +59,24 @@ namespace WpfSamterOpcClient
 
         }
 
+
+        private void BtAutoStop_Checked(object sender, RoutedEventArgs e)
+        {
+            TbAutoStopStatus.Text = "Enabled";
+            TbAutoStopStatus.Foreground = Brushes.Green;
+            Properties.Settings.Default.autoStop = true;
+            Properties.Settings.Default.Save();
+
+        }
+        private void BtAutoStop_UnChecked(object sender, RoutedEventArgs e)
+        {
+            TbAutoStopStatus.Text = "Disabled";
+            TbAutoStopStatus.Foreground = Brushes.Red;
+            Properties.Settings.Default.autoStop = false;
+            Properties.Settings.Default.Save();
+        }
+
+
         private void BtSuspendJob_Click(object sender, RoutedEventArgs e)
         {
             opcClient.WriteItemValue(opcClient.orderComplete, true);
@@ -91,6 +109,20 @@ namespace WpfSamterOpcClient
 
                 TbQuantityValue.Text = "0";
                 TbOrderQuantityValue.Text = "0";
+
+    
+                bool autoStopStatus = Properties.Settings.Default.autoStop;
+                BtAutoStop.IsChecked = autoStopStatus;
+                if (autoStopStatus == true)
+                {
+                    TbAutoStopStatus.Text = "Enabled";
+                    TbAutoStopStatus.Foreground = Brushes.Green;
+                }
+                else
+                {
+                    TbAutoStopStatus.Text = "Disabled";
+                    TbAutoStopStatus.Foreground = Brushes.Red;
+                }
             }));
         }
 
@@ -105,6 +137,7 @@ namespace WpfSamterOpcClient
             }));
         }
 
+        //TODO 코드 분리, 리펙토링 필요
         public void SetChangeItemValue(string itemId, string value)
         {
             try
@@ -134,6 +167,33 @@ namespace WpfSamterOpcClient
                             TbStatusValue.Text = "STOP";
                             TbStatusValue.Foreground = Brushes.Red;
                         }
+
+                        // auto stop enable === true 
+                        if (BtAutoStop.IsChecked == false)
+                        {
+                            string prodQt = "0";
+                            string orderQt = "0";
+                            prodQt = opcClient.ReadItemValue(opcClient.quantity).ToString();
+                            orderQt = opcClient.ReadItemValue(opcClient.orderQuantity).ToString();
+                            string dateNowUTC = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
+
+                            //작업 종료시간
+                            if (Int32.Parse(prodQt) > Int32.Parse(orderQt))
+                            {
+                                endDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
+                                opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
+
+                                string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
+                                string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
+
+                                TimeSpan timeDiff = DateTime.Parse(endDt) - DateTime.Parse(startDt);
+
+                                String processingTime = timeDiff.ToString();
+                                processingTimeValue.Text = processingTime;
+                                opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
+                            }
+                        }
                     }
 
                     if (itemId == opcClient.error)
@@ -143,7 +203,7 @@ namespace WpfSamterOpcClient
                             TbStatusValue.Text = "ERROR";
                             TbStatusValue.Foreground = Brushes.Red;
                         }
-         
+
                     }
 
                     //speed
@@ -182,29 +242,37 @@ namespace WpfSamterOpcClient
                             startDtValue.Text = dateNowUTC.ToString();
                             opcClient.WriteItemValue(opcClient.startDTTM, Convert.ToDateTime(dateNowUTC));
                         }
-                        //작업 종료시간
-                        if ((Int32.Parse(value) > 0) && Int32.Parse(value) == Int32.Parse(orderQt))
+
+                        // auto stop enable === true 
+                        if (BtAutoStop.IsChecked == true)
                         {
-                            endDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
-                            opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
+                            //작업 종료시간
+                            if ((Int32.Parse(value) > 0) && Int32.Parse(value) == Int32.Parse(orderQt))
+                            {
+                                endDtValue.Text = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss").ToString();
+                                opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
+                            }
+
+
+                            if ((Int32.Parse(value) > 0 && Int32.Parse(orderQt) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
+                            {
+                                Debug.WriteLine("ture?");
+
+                                opcClient.WriteItemValue(opcClient.orderComplete, true);
+
+                                // 작업 시간
+                                string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
+                                string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
+
+                                TimeSpan timeDiff = DateTime.Parse(endDt) - DateTime.Parse(startDt);
+
+                                String processingTime = timeDiff.ToString();
+                                processingTimeValue.Text = processingTime;
+                                opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
+                            }
                         }
 
 
-                        if ((Int32.Parse(value) > 0 && Int32.Parse(orderQt) > 0) && Int32.Parse(value) >= Int32.Parse(orderQt))
-                        {
-                            opcClient.WriteItemValue(opcClient.orderComplete, true);
-
-                            // 작업 시간
-                            string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
-                            string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
-
-                            TimeSpan timeDiff = DateTime.Parse(endDt) - DateTime.Parse(startDt);
-
-                            String processingTime = timeDiff.ToString();
-                            processingTimeValue.Text = processingTime;
-                            opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
-
-                        }
                     }
 
                     //orderCount
