@@ -44,17 +44,17 @@ namespace WpfSamterOpcClient
             try
             {
                 // Config
-                MainWindow.main.writeLog("Step 1 - Create a config.");
+                MainWindow.main.WriteLog("Step 1 - Create a config.");
                 config = CreateOpcUaAppConfiguration();
 
                 // Create Session
-                MainWindow.main.writeLog("Step 2 - Create a session with your server.");
+                MainWindow.main.WriteLog("Step 2 - Create a session with your server.");
                 m_session = await Session.Create(config, new ConfiguredEndpoint(null, new EndpointDescription(endPointUrl)), true, "", 60000, null, null);
                 m_session.KeepAlive += new KeepAliveEventHandler(Session_KeepAlive);
 
 
                 // Browse Session
-                MainWindow.main.writeLog("Step 3 - Browse the server namespace.");
+                MainWindow.main.WriteLog("Step 3 - Browse the server namespace.");
                 ReferenceDescriptionCollection refs;
                 Byte[] cp;
                 m_session.Browse(null, null, ObjectIds.ObjectsFolder, 0u, BrowseDirection.Forward, ReferenceTypeIds.HierarchicalReferences, true, (uint)NodeClass.Variable | (uint)NodeClass.Object | (uint)NodeClass.Method, out cp, out refs);
@@ -62,10 +62,10 @@ namespace WpfSamterOpcClient
                 MainWindow.main.SetConnectItemValue();
 
                 // Create Subscription
-                MainWindow.main.writeLog("Step 4 - Create a subscription. Set a faster publishing interval if you wish.");
+                MainWindow.main.WriteLog("Step 4 - Create a subscription. Set a faster publishing interval if you wish.");
                 subscription = new Subscription(m_session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
-                MainWindow.main.writeLog("Step 5 - Add a list of items you wish to monitor to the subscription.");
+                MainWindow.main.WriteLog("Step 5 - Add a list of items you wish to monitor to the subscription.");
                 string[] item = { run, stop, error, speed, jobOrder, articleCode, orderComplete, quantity, orderQuantity, startDTTM, endDTTM, processingTime };
 
                 for (int i = 0; i < item.Length; i++)
@@ -81,7 +81,7 @@ namespace WpfSamterOpcClient
                     subscription.AddItem(monitoredItem);
                 }
 
-                MainWindow.main.writeLog("Step 6 - Add the subscription to the session.");
+                MainWindow.main.WriteLog("Step 6 - Add the subscription to the session.");
                 // session에 subscription 추가
                 m_session.AddSubscription(subscription);
                 // subscription 생성
@@ -217,7 +217,7 @@ namespace WpfSamterOpcClient
             string Value = notification.Value.WrappedValue.ToString();
             string StatusCode = notification.Value.StatusCode.ToString();
 
-            MainWindow.main.writeLog($"NodeId: {NodeId} // value: {Value} // StatusCode: {StatusCode} // TimeStemp: {DateTime.Now}");
+            MainWindow.main.WriteLog($"NodeId: {NodeId} // value: {Value} // StatusCode: {StatusCode} // TimeStemp: {DateTime.Now}");
 
             //TODO: 안티패턴 해결 필요
             if (StatusCode != "Bad")

@@ -34,5 +34,17 @@ namespace WpfSamterOpcClient.Properties {
                 this["autoStop"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool windowStartUp {
+            get {
+                return ((bool)(this["windowStartUp"]));
+            }
+            set {
+                this["windowStartUp"] = value;
+            }
+        }
     }
 }
