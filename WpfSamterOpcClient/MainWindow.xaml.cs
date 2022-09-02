@@ -72,7 +72,7 @@ namespace WpfSamterOpcClient
             item1.Text = "windows startUp";
 
             //시작 프로그램 등록 확인
-            bool isWindowStartUp= Properties.Settings.Default.windowStartUp;
+            bool isWindowStartUp = Properties.Settings.Default.windowStartUp;
             item1.Checked = isWindowStartUp;
 
             item1.Click += delegate (object click, EventArgs eventArgs)
@@ -158,7 +158,6 @@ namespace WpfSamterOpcClient
             TbAutoStopStatus.Foreground = Brushes.Green;
             Properties.Settings.Default.autoStop = true;
             Properties.Settings.Default.Save();
-
         }
 
         private void BtAutoStop_UnChecked(object sender, RoutedEventArgs e)
@@ -222,6 +221,23 @@ namespace WpfSamterOpcClient
                         {
                             TbStatusValue.Text = "STOP";
                             TbStatusValue.Foreground = Brushes.Red;
+
+                            if (BtAutoStop.IsChecked == false)
+                            {
+                                int prodQt = Int32.Parse(opcClient.ReadItemValue(opcClient.quantity).ToString());
+                                int orderQt = Int32.Parse(opcClient.ReadItemValue(opcClient.orderQuantity).ToString());
+                                string dateNowUTC = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+
+                                if (prodQt > orderQt)
+                                {
+                                    string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
+                                    startDtValue.Text = startDt;
+
+                                    opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
+                                    endDtValue.Text = dateNowUTC;
+                                    SetProcessingTime();
+                                }
+                            }
                         }
                     }
 
@@ -278,21 +294,16 @@ namespace WpfSamterOpcClient
                                 if (prodQt == Int32.Parse(orderQt))
                                 {
                                     opcClient.WriteItemValue(opcClient.orderComplete, true);
+                                    endDtValue.Text = dateNowUTC;
+                                    opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
+                                    SetProcessingTime();
                                 }
                             }
 
                             if (prodQt >= Int32.Parse(orderQt))
                             {
-                                endDtValue.Text = dateNowUTC;
-                                opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
-                                SetProcessingTime();
+    
                             }
-
-                            //장비 수량 변경시 마다 호출.... 수정 필요 stop 태그 들어올때
-                            string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
-                            string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
-                            startDtValue.Text = startDt;
-                            endDtValue.Text = endDt;
                         }
                     }
 
@@ -352,7 +363,7 @@ namespace WpfSamterOpcClient
                 }
             }
         }
-       
+
         public void CreateInfoFile()
         {
             try
