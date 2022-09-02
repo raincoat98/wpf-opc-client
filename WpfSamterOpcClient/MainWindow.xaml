@@ -40,7 +40,7 @@
                     <TextBlock Text="Job Order: " VerticalAlignment="Center" Grid.Column="0" />
 
                     <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
-                        <TextBlock x:Name="TbOrderIdValue" FontSize="20" Text="0000" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TbOrderIdValue" FontSize="20" VerticalAlignment="Center" />
                     </materialDesign:Card>
                     <!--
                     <StackPanel  VerticalAlignment="Center" Grid.Column="2">
@@ -56,7 +56,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Article Code: " VerticalAlignment="Center" Grid.Column="0" />
                     <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
-                        <TextBlock x:Name="TbArticleCodeValue" FontSize="20" Text="A" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TbArticleCodeValue" FontSize="20"  VerticalAlignment="Center" />
                     </materialDesign:Card>
                     <!--
                     <StackPanel  VerticalAlignment="Center" Grid.Column="2">

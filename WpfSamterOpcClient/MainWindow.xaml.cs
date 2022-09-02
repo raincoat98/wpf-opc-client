@@ -1,8 +1,11 @@
 ﻿using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -45,7 +48,7 @@ namespace WpfSamterOpcClient
             InitItemValue();
             SetNotification();
 
-            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
+            Task.Run(async () => await opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
         }
 
         private void SetNotification()
@@ -124,11 +127,16 @@ namespace WpfSamterOpcClient
                 TbStatusValue.Foreground = Brushes.Red;
 
                 TbSpeedValue.Text = "0";
-                TbOrderIdValue.Text = "0000";
-                TbArticleCodeValue.Text = "A";
+                TbOrderIdValue.Text = "";
+                TbArticleCodeValue.Text = "";
 
                 TbQuantityValue.Text = "0";
                 TbOrderQuantityValue.Text = "0";
+
+                startDtValue.Text = GetErpJobValue("START_DTTM");
+                endDtValue.Text = GetErpJobValue("END_DTTM");
+                processingTimeValue.Text = GetErpJobValue("PROCESSING_TIME");
+
 
                 bool autoStopStatus = Properties.Settings.Default.autoStop;
                 BtAutoStop.IsChecked = autoStopStatus;
@@ -149,7 +157,8 @@ namespace WpfSamterOpcClient
         #region 버튼 클릭 함수
         private void btnReConnect_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
+            Task.Run(async () => await opcClient.Opcua_start($"opc.tcp://{KEPSERVER_PATH}:49320"));
+
         }
 
         private void BtAutoStop_Checked(object sender, RoutedEventArgs e)
@@ -183,13 +192,15 @@ namespace WpfSamterOpcClient
 
         private void SetProcessingTime()
         {
-            string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
-            string endDt = opcClient.ReadItemValue(opcClient.endDTTM).ToString();
+            string startDt = GetErpJobValue("START_DTTM");
+            string endDt = GetErpJobValue("END_DTTM");
 
             TimeSpan timeDiff = DateTime.Parse(endDt) - DateTime.Parse(startDt);
 
             String processingTime = timeDiff.ToString();
+
             processingTimeValue.Text = processingTime;
+            SetErpJobValue("PROCESSING_TIME", processingTime);
             opcClient.WriteItemValue(opcClient.processingTime, $"{processingTime}");
         }
 
@@ -200,7 +211,12 @@ namespace WpfSamterOpcClient
                 this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     //TODO: switch 문으로 변경
+
+                    //kepware tag 문자열 default value 제외
+                    if (value.StartsWith("String")) return; 
+                    /* if (value.StartsWith("0")) return;*/
                     //run
+
                     if (itemId == opcClient.run)
                     {
                         if (value.Equals("True"))
@@ -213,6 +229,7 @@ namespace WpfSamterOpcClient
                             TbStatusValue.Text = "READY";
                             TbStatusValue.Foreground = Brushes.Red;
                         }
+                        return;
                     }
 
                     if (itemId == opcClient.stop)
@@ -224,13 +241,13 @@ namespace WpfSamterOpcClient
 
                             if (BtAutoStop.IsChecked == false)
                             {
-                                int prodQt = Int32.Parse(opcClient.ReadItemValue(opcClient.quantity).ToString());
-                                int orderQt = Int32.Parse(opcClient.ReadItemValue(opcClient.orderQuantity).ToString());
+                                int prodQt = Int32.Parse(GetProdutionQuantity());
+                                int orderQt = Int32.Parse(GetErpJobValue("ORDER_QUANTITY"));
                                 string dateNowUTC = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
 
                                 if (prodQt > orderQt)
                                 {
-                                    string startDt = opcClient.ReadItemValue(opcClient.startDTTM).ToString();
+                                    string startDt = GetErpJobValue("ORDER_QUANTITY");
                                     startDtValue.Text = startDt;
 
                                     opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
@@ -239,6 +256,7 @@ namespace WpfSamterOpcClient
                                 }
                             }
                         }
+                        return;
                     }
 
                     if (itemId == opcClient.error)
@@ -248,33 +266,65 @@ namespace WpfSamterOpcClient
                             TbStatusValue.Text = "ERROR";
                             TbStatusValue.Foreground = Brushes.Red;
                         }
+                        return;
                     }
 
                     //speed
                     if (itemId == opcClient.speed)
                     {
                         TbSpeedValue.Text = value;
+                        return;
                     }
 
                     //orderId
                     if (itemId == opcClient.jobOrder)
                     {
+                        //Opc 기본 값 string으로 초기화 되는 문제로 db에서 데이터를 가져와야함 / 220706 해결 220723
+                        SetErpJobValue("JOB_ORDER", value);
                         TbOrderIdValue.Text = value;
+
+                        //order 값이 변경될 때 값을 초기화
+                        /*                        
+                         *initOrderValue
+                         *initOrderDate
+                        */
+                        TbArticleCodeValue.Text = "";
+                        TbOrderQuantityValue.Text = "0";
+                        TbQuantityValue.Text = "0";
+
+                        startDtValue.Text = "";
+                        endDtValue.Text = "";
+                        processingTimeValue.Text = "";
+                        return;
                     }
 
-                    //articleCode
+                    //품목
                     if (itemId == opcClient.articleCode)
                     {
+                        SetErpJobValue("ARTICLE_CODE", value);
                         TbArticleCodeValue.Text = value;
+                        return;
+                    }
+                    //장비코드
+                    if (itemId == opcClient.equipCode)
+                    {
+                        SetErpJobValue("EQUIP_CODE", value);
+                        return;
                     }
 
                     //장비 생산량
-                    if (itemId == opcClient.quantity)
+                    if (itemId == opcClient.prodSignal)
                     {
-                        TbQuantityValue.Text = value;
+                        IncreaseProdutionProcedure(Convert.ToBoolean(value));
 
-                        int prodQt = Int32.Parse(value);
+                        TbQuantityValue.Text = GetProdutionQuantity();
+
+                        int prodQt = Int32.Parse(GetProdutionQuantity());
                         string orderQt = opcClient.ReadItemValue(opcClient.orderQuantity).ToString();
+                        if (value.Equals("True"))
+                        {
+                            opcClient.WriteItemValue(opcClient.prodQuantity, Int32.Parse(GetProdutionQuantity()));
+                        }
 
                         string dateNowUTC = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
 
@@ -282,35 +332,42 @@ namespace WpfSamterOpcClient
                         if (prodQt == 1)
                         {
                             startDtValue.Text = dateNowUTC;
+                            SetErpJobValue("START_DTTM", dateNowUTC);
                             opcClient.WriteItemValue(opcClient.startDTTM, Convert.ToDateTime(dateNowUTC));
                         }
 
                         if (prodQt > 0)
                         {
-                            //자동 종료 버튼 활성화 시 
-                            if (BtAutoStop.IsChecked == true)
+                            if (prodQt == Int32.Parse(orderQt))
                             {
-                                //장비 생산량과 주문 생산량이 같을 경우 장비 종료
-                                if (prodQt == Int32.Parse(orderQt))
+                                opcClient.WriteItemValue(opcClient.finalQuantity, Int32.Parse(GetProdutionQuantity()));
+
+                                //자동 종료 버튼 활성화 시 
+                                if (BtAutoStop.IsChecked == true)
                                 {
-                                    opcClient.WriteItemValue(opcClient.orderComplete, true);
+                                    // 목표 수량 달성시 종료 시간 업데이트
                                     endDtValue.Text = dateNowUTC;
+                                    SetErpJobValue("END_DTTM", dateNowUTC);
                                     opcClient.WriteItemValue(opcClient.endDTTM, Convert.ToDateTime(dateNowUTC));
                                     SetProcessingTime();
+
+                                    //장비 생산량과 주문 생산량이 같을 경우 장비 멈춤
+                                    opcClient.WriteItemValue(opcClient.orderComplete, true);
+                                    Thread.Sleep(1000);
+                                    opcClient.WriteItemValue(opcClient.orderComplete, false);
                                 }
                             }
-
-                            if (prodQt >= Int32.Parse(orderQt))
-                            {
-    
-                            }
                         }
+                        return;
                     }
 
                     //주문 생산량
                     if (itemId == opcClient.orderQuantity)
                     {
+                        if (value.StartsWith("0")) return;
+                        SetErpJobValue("ORDER_QUANTITY", value);
                         TbOrderQuantityValue.Text = value;
+                        return;
                     }
 
                 }));
@@ -418,6 +475,190 @@ namespace WpfSamterOpcClient
 
             }
         }
-        #endregion        
+        #endregion
+
+        private static SqlConnection CreateConnection(
+String ip = "127.0.0.1",
+String id = "esamter",
+String password = "esamter1!",
+String dbName = "ActiveMCN")
+        {
+            SqlConnectionStringBuilder builder
+                = new SqlConnectionStringBuilder();
+
+            builder.DataSource = ip;
+            builder.UserID = id;
+            builder.Password = password;
+            builder.InitialCatalog = dbName;
+
+            return new SqlConnection(builder.ConnectionString);
+        }
+
+        private static void IncreaseProdutionProcedure(bool value)
+        {
+            //커넥션 생성
+            using (SqlConnection conn = CreateConnection())
+            {
+                try
+
+                {
+                    // sql 커넥션 연결
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand("Daemon_Write_Count", conn);
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    Debug.WriteLine("pdc 프로시저 실행");
+
+                    cmd.Parameters.AddWithValue("@LINE_CD", 1);
+                    cmd.Parameters.AddWithValue("@MCN_NM", "ls");
+                    Debug.WriteLine(value);
+                    cmd.Parameters.AddWithValue("@FLAG", value);
+
+                    int result = cmd.ExecuteNonQuery();
+                    Debug.WriteLine("pdc 프로시저 실행 VALUE:{0}, Affected rows:{1}", value, result);
+                }
+                catch (SqlException se)
+                {
+                    Console.WriteLine("Sql Error: " + se.Message);
+
+                }
+                finally
+                {
+                    if (conn != null &&
+                        conn.State == System.Data.ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
+
+        private static string GetProdutionQuantity()
+        {
+            //커넥션 생성
+            using (SqlConnection conn = CreateConnection())
+            {
+                try
+                {
+                    // sql 커넥션 연결
+                    conn.Open();
+                    SqlDataReader dr;
+
+                    // 데이터 베이스 셀럭트 쿼리
+                    SqlCommand cmd = new SqlCommand("select count from pdc_real", conn);
+
+                    // mssql에 쿼리 날림
+
+                    dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
+                    {
+                        Console.WriteLine(String.Format("{0}", dr["count"]));
+                        return String.Format("{0}", dr["count"]);
+                    }
+                }
+                catch (SqlException se)
+                {
+                    Console.WriteLine("Sql Error: " + se.Message);
+                }
+                finally
+                {
+                    if (conn != null &&
+                        conn.State == System.Data.ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+            return "0";
+        }
+
+        private static string GetErpJobValue(string name)
+        {
+            //커넥션 생성
+            using (SqlConnection conn = CreateConnection())
+            {
+                try
+                {
+                    // sql 커넥션 연결
+                    conn.Open();
+                    SqlDataReader dr;
+
+
+                    // 데이터 베이스 셀럭트 쿼리
+                    SqlCommand cmd = new SqlCommand($"select {name} from ERP_WORK", conn);
+
+                    // mssql에 쿼리 날림
+
+                    dr = cmd.ExecuteReader();
+
+                    if (dr.Read())
+                    {
+                        Console.WriteLine(String.Format("{0}", dr[$"{name}"]));
+                        MainWindow.main.WriteLog(String.Format("ERP_WORK 조회 {0}", dr[$"{name}"]));
+                        return String.Format("{0}", dr[$"{name}"]);
+                    }
+                }
+                catch (SqlException se)
+                {
+                    Console.WriteLine("Sql Error: " + se.Message);
+                }
+                finally
+                {
+                    if (conn != null &&
+                        conn.State == System.Data.ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+
+                }
+            }
+            return "";
+        }
+
+        private static void SetErpJobValue(string name, string value)
+        {
+            //커넥션 생성
+            using (SqlConnection conn = CreateConnection())
+            {
+                try
+
+                {
+                    /*                  if (value.StartsWith("String")) return;
+                                        if (value.StartsWith("0")) return;*/
+
+                    // sql 커넥션 연결
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand("UPDATE_ERP_WORK", conn);
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    Debug.WriteLine($"UPDATE_ERP_WORK {name} 프로시저 실행");
+
+                    cmd.Parameters.AddWithValue("@NAME", name);
+                    cmd.Parameters.AddWithValue("@Value", value);
+
+                    int result = cmd.ExecuteNonQuery();
+                    Debug.WriteLine("UPDATE_ERP_WORK  프로시저 실행 VALUE:{0}, Affected rows:{1}", value, result);
+
+                }
+                catch (SqlException se)
+                {
+                    Console.WriteLine("Sql Error: " + se.Message);
+
+                }
+                finally
+                {
+                    if (conn != null &&
+                        conn.State == System.Data.ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+        }
     }
 }
