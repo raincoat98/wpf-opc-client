@@ -20,9 +20,8 @@ namespace WpfSamterOpcClient
         public readonly string articleCode = "wookil-mes.diecutter1.articleCode";
         public readonly string equipCode = "wookil-mes.diecutter1.equipCode";
         public readonly string orderComplete = "wookil.diecutter1.orderCompleted";
-        public readonly string prodSignal = "wookil.diecutter1.prodSignal";
-        public readonly string prodQuantity = "wookil-mes.diecutter1.prodQuantity";
-        public readonly string orderQuantity = "wookil.diecutter1.orderQuantity";
+        public readonly string prodQuantity = "wookil.diecutter1.prodQuantity";
+        public readonly string orderQuantity = "wookil-mes.diecutter1.orderQuantity";
         public readonly string startDTTM = "wookil-mes.diecutter1.startDTTM";
         public readonly string endDTTM = "wookil-mes.diecutter1.endDTTM";
         public readonly string processingTime = "wookil-mes.diecutter1.processingTime";
@@ -67,7 +66,7 @@ namespace WpfSamterOpcClient
                 subscription = new Subscription(m_session.DefaultSubscription) { PublishingInterval = 1000, PublishingEnabled = true };
 
                 MainWindow.main.WriteLog("Step 5 - Add a list of items you wish to monitor to the subscription.");
-                string[] item = { run, stop, error, speed, jobOrder, articleCode, orderComplete, prodQuantity, prodSignal, orderQuantity, startDTTM, endDTTM, processingTime };
+                string[] item = { run, stop, error, speed, jobOrder, articleCode, orderComplete, prodQuantity, orderQuantity, startDTTM, endDTTM, processingTime };
 
                 for (int i = 0; i < item.Length; i++)
                 {
