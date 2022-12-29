@@ -58,12 +58,11 @@
                     <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth0" Grid.Column="1" Padding="10">
                         <TextBlock x:Name="TbArticleCodeValue" FontSize="20"  VerticalAlignment="Center" />
                     </materialDesign:Card>
-                    <!--
-                    <StackPanel  VerticalAlignment="Center" Grid.Column="2">
-                        <Button  x:Name="BtSuspendJob" FontWeight="SemiBold" Content="Suspend job" FontSize="20" Height="50" Click="BtSuspendJob_Click"  Margin="10,0,0,0" Cursor="Hand" />
-                    </StackPanel>
-                    -->
                 </Grid>
+
+                <StackPanel>
+                    <Button x:Name="BtSuspendJob" Click="BtSuspendJob_Click" Content="Suspend job" Width="180" Height="50" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="20" Cursor="Hand"/>
+                </StackPanel>
             </StackPanel>
         </Grid>
         <Grid Grid.Row="2" >

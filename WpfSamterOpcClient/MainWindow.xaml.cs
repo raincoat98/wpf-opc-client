@@ -223,6 +223,12 @@ namespace WpfSamterOpcClient
             Properties.Settings.Default.autoStop = false;
             Properties.Settings.Default.Save();
         }
+
+        private void BtSuspendJob_Click(object sender, RoutedEventArgs e)
+        {
+            opcClient.WriteItemValue(opcClient.finalQuantity, Int32.Parse(GetProdutionQuantity()));
+        }
+
         #endregion
 
         #region opc 관련 함수
